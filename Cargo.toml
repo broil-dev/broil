@@ -1,0 +1,21 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/broil",
+    "crates/broil-cli",
+    "crates/broil-command",
+    "crates/broil-config",
+    "crates/broil-core",
+    "crates/broil-remote",
+]
+exclude = ["crates/vendor/russh-0.62.5"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+serde_json = "1"
+tempfile = "3"

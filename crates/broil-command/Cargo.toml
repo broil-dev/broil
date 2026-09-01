@@ -1,0 +1,14 @@
+[package]
+name = "broil-command"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+broil-config = { path = "../broil-config" }
+broil-core = { path = "../broil-core" }
+broil-remote = { path = "../broil-remote" }
+rustix = { version = "1", features = ["fs"] }
+serde_json.workspace = true
+tempfile.workspace = true

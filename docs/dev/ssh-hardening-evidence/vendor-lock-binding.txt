@@ -1,0 +1,3 @@
+case=registry-source-lock-with-vendored-manifest
+exit_status=101
+diagnostic=error: the lock file $DISPOSABLE_PRODUCTION_WORKSPACE/Cargo.lock needs to be updated but --locked was passed to prevent this

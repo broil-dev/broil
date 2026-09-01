@@ -1,0 +1,481 @@
+diff --git a/russh/src/auth.rs b/russh/src/auth.rs
+index 3f31440..749449c 100644
+--- a/russh/src/auth.rs
++++ b/russh/src/auth.rs
+@@ -16,0 +17 @@ use std::future::Future;
++use std::fmt::{Debug, Formatter};
+@@ -23,0 +25 @@ use tokio::io::{AsyncRead, AsyncWrite};
++use zeroize::Zeroizing;
+@@ -73 +75,4 @@ impl From<&MethodKind> for String {
+-pub struct MethodSet(Vec<MethodKind>);
++pub struct MethodSet {
++    methods: Vec<MethodKind>,
++    has_unknown: bool,
++}
+@@ -79 +84 @@ impl Deref for MethodSet {
+-        &self.0
++        &self.methods
+@@ -101,6 +106,12 @@ impl From<&NameList> for MethodSet {
+-        Self(
+-            value
+-                .iter()
+-                .filter_map(|x| MethodKind::from_str(x).ok())
+-                .collect(),
+-        )
++        let mut methods = Vec::new();
++        let mut has_unknown = false;
++        for method in value.iter() {
++            match MethodKind::from_str(method) {
++                Ok(method) => methods.push(method),
++                Err(()) => has_unknown = true,
++            }
++        }
++        Self {
++            methods,
++            has_unknown,
++        }
+@@ -112 +123,4 @@ impl MethodSet {
+-        Self(Vec::new())
++        Self {
++            methods: Vec::new(),
++            has_unknown: false,
++        }
+@@ -116,7 +130,14 @@ impl MethodSet {
+-        Self(vec![
+-            MethodKind::None,
+-            MethodKind::Password,
+-            MethodKind::PublicKey,
+-            MethodKind::HostBased,
+-            MethodKind::KeyboardInteractive,
+-        ])
++        Self {
++            methods: vec![
++                MethodKind::None,
++                MethodKind::Password,
++                MethodKind::PublicKey,
++                MethodKind::HostBased,
++                MethodKind::KeyboardInteractive,
++            ],
++            has_unknown: false,
++        }
++    }
++
++    pub fn has_unknown(&self) -> bool {
++        self.has_unknown
+@@ -126 +147 @@ impl MethodSet {
+-        self.0.retain(|x| *x != method);
++        self.methods.retain(|x| *x != method);
+@@ -133 +154,30 @@ impl MethodSet {
+-        self.0.push(method);
++        self.methods.push(method);
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn method_set_preserves_unknown_method_signal() {
++        let names = NameList(vec![
++            "publickey".to_string(),
++            "future-method".to_string(),
++            "hostbased".to_string(),
++        ]);
++
++        let methods = MethodSet::from(&names);
++
++        assert_eq!(&*methods, [MethodKind::PublicKey, MethodKind::HostBased]);
++        assert!(methods.has_unknown());
++    }
++
++    #[test]
++    fn method_set_known_names_have_no_unknown_signal() {
++        let names = NameList(vec!["publickey".to_string()]);
++
++        let methods = MethodSet::from(&names);
++
++        assert_eq!(&*methods, [MethodKind::PublicKey]);
++        assert!(!methods.has_unknown());
+@@ -196 +245,0 @@ impl<R: AsyncRead + AsyncWrite + Unpin + Send> Signer
+-#[derive(Debug)]
+@@ -201 +250 @@ pub enum Method {
+-        password: String,
++        password: Zeroizing<String>,
+@@ -225,0 +275,35 @@ pub enum Method {
++impl Debug for Method {
++    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
++        match self {
++            Self::None => f.write_str("None"),
++            Self::Password { .. } => f
++                .debug_struct("Password")
++                .field("password", &"[REDACTED]")
++                .finish(),
++            Self::PublicKey { .. } => f
++                .debug_struct("PublicKey")
++                .field("key", &"[REDACTED]")
++                .finish(),
++            Self::OpenSshCertificate { cert, .. } => f
++                .debug_struct("OpenSshCertificate")
++                .field("key", &"[REDACTED]")
++                .field("cert", cert)
++                .finish(),
++            Self::FuturePublicKey { key, hash_alg } => f
++                .debug_struct("FuturePublicKey")
++                .field("key", key)
++                .field("hash_alg", hash_alg)
++                .finish(),
++            Self::FutureCertificate { cert, hash_alg } => f
++                .debug_struct("FutureCertificate")
++                .field("cert", cert)
++                .field("hash_alg", hash_alg)
++                .finish(),
++            Self::KeyboardInteractive { submethods } => f
++                .debug_struct("KeyboardInteractive")
++                .field("submethods", submethods)
++                .finish(),
++        }
++    }
++}
++
+diff --git a/russh/src/client/encrypted.rs b/russh/src/client/encrypted.rs
+index fb4dac9..06bbe5b 100644
+--- a/russh/src/client/encrypted.rs
++++ b/russh/src/client/encrypted.rs
+@@ -22,0 +23 @@ use ssh_key::Algorithm;
++use zeroize::Zeroize;
+@@ -77,6 +78,4 @@ impl Session {
+-                                if let Some(ref meth) = self.common.auth_method {
+-                                    let len = enc.write.len();
+-                                    let auth_request = AuthRequest::new(meth);
+-                                    #[allow(clippy::indexing_slicing)] // length checked
+-                                    if enc.write_auth_request(&self.common.auth_user, meth)? {
+-                                        debug!("enc: {:?}", &enc.write[len..]);
++                                if let Some(meth) = self.common.auth_method.take() {
++                                    let auth_request = AuthRequest::new(&meth);
++                                    if enc.write_auth_request(&self.common.auth_user, &meth)? {
++                                        debug!("writing authentication request");
+@@ -84,0 +84,3 @@ impl Session {
++                                    if !matches!(&meth, auth::Method::Password { .. }) {
++                                        self.common.auth_method = Some(meth);
++                                    }
+@@ -104,0 +107 @@ impl Session {
++                            self.common.auth_method = None;
+@@ -199,0 +203,5 @@ impl Session {
++                                enum AuthResponses {
++                                    Legacy(Vec<String>),
++                                    Secure(zeroize::Zeroizing<Vec<String>>),
++                                }
++
+@@ -200,0 +209 @@ impl Session {
++                                let mut secure_responses_closed = false;
+@@ -202,3 +211,21 @@ impl Session {
+-                                    match self.receiver.recv().await {
+-                                        Some(Msg::AuthInfoResponse { responses }) => {
+-                                            break responses;
++                                    tokio::select! {
++                                        response = self.secure_response_receiver.recv(),
++                                            if !secure_responses_closed =>
++                                        {
++                                            match response {
++                                                Some(responses) => {
++                                                    break AuthResponses::Secure(responses);
++                                                }
++                                                None => secure_responses_closed = true,
++                                            }
++                                        }
++                                        message = self.receiver.recv() => {
++                                            match message {
++                                                Some(Msg::AuthInfoResponse { responses }) => {
++                                                    break AuthResponses::Legacy(responses);
++                                                }
++                                                None => {
++                                                    return Err(crate::Error::RecvError.into());
++                                                }
++                                                _ => {}
++                                            }
+@@ -206,2 +232,0 @@ impl Session {
+-                                        None => return Err(crate::Error::RecvError.into()),
+-                                        _ => {}
+@@ -211 +236,10 @@ impl Session {
+-                                enc.client_send_auth_response(&responses)?;
++                                match responses {
++                                    AuthResponses::Legacy(mut responses) => {
++                                        let result = enc.client_send_auth_response(&responses);
++                                        responses.zeroize();
++                                        result?;
++                                    }
++                                    AuthResponses::Secure(responses) => {
++                                        enc.client_send_auth_response(&responses)?;
++                                    }
++                                }
+@@ -934 +968,5 @@ impl Session {
+-        self.common.auth_method = Some(meth);
++        if is_waiting && matches!(&meth, auth::Method::Password { .. }) {
++            drop(meth);
++        } else {
++            self.common.auth_method = Some(meth);
++        }
+diff --git a/russh/src/client/mod.rs b/russh/src/client/mod.rs
+index 4dcd7a5..dedbc26 100644
+--- a/russh/src/client/mod.rs
++++ b/russh/src/client/mod.rs
+@@ -58,0 +59 @@ use tokio::sync::oneshot;
++use zeroize::{Zeroize, Zeroizing};
+@@ -60 +61 @@ use tokio::sync::oneshot;
+-pub use crate::auth::AuthResult;
++pub use crate::auth::{AuthResult, Method};
+@@ -92,0 +94 @@ pub struct Session {
++    secure_response_receiver: Receiver<Zeroizing<Vec<String>>>,
+@@ -135 +136,0 @@ enum Reply {
+-#[derive(Debug)]
+@@ -221,0 +223,145 @@ pub enum Msg {
++impl std::fmt::Debug for Msg {
++    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        match self {
++            Self::Authenticate { user, method } => f
++                .debug_struct("Authenticate")
++                .field("user", user)
++                .field("method", method)
++                .finish(),
++            Self::AuthInfoResponse { responses } => f
++                .debug_struct("AuthInfoResponse")
++                .field("response_count", &responses.len())
++                .field("responses", &"[REDACTED]")
++                .finish(),
++            Self::Signed { data } => f.debug_struct("Signed").field("data", data).finish(),
++            Self::ChannelOpenSession { channel_ref } => f
++                .debug_struct("ChannelOpenSession")
++                .field("channel_ref", channel_ref)
++                .finish(),
++            Self::ChannelOpenX11 {
++                originator_address,
++                originator_port,
++                channel_ref,
++            } => f
++                .debug_struct("ChannelOpenX11")
++                .field("originator_address", originator_address)
++                .field("originator_port", originator_port)
++                .field("channel_ref", channel_ref)
++                .finish(),
++            Self::ChannelOpenDirectTcpIp {
++                host_to_connect,
++                port_to_connect,
++                originator_address,
++                originator_port,
++                channel_ref,
++            } => f
++                .debug_struct("ChannelOpenDirectTcpIp")
++                .field("host_to_connect", host_to_connect)
++                .field("port_to_connect", port_to_connect)
++                .field("originator_address", originator_address)
++                .field("originator_port", originator_port)
++                .field("channel_ref", channel_ref)
++                .finish(),
++            Self::ChannelOpenDirectStreamLocal {
++                socket_path,
++                channel_ref,
++            } => f
++                .debug_struct("ChannelOpenDirectStreamLocal")
++                .field("socket_path", socket_path)
++                .field("channel_ref", channel_ref)
++                .finish(),
++            Self::TcpIpForward {
++                reply_channel,
++                address,
++                port,
++            } => f
++                .debug_struct("TcpIpForward")
++                .field("reply_channel", reply_channel)
++                .field("address", address)
++                .field("port", port)
++                .finish(),
++            Self::CancelTcpIpForward {
++                reply_channel,
++                address,
++                port,
++            } => f
++                .debug_struct("CancelTcpIpForward")
++                .field("reply_channel", reply_channel)
++                .field("address", address)
++                .field("port", port)
++                .finish(),
++            Self::StreamLocalForward {
++                reply_channel,
++                socket_path,
++            } => f
++                .debug_struct("StreamLocalForward")
++                .field("reply_channel", reply_channel)
++                .field("socket_path", socket_path)
++                .finish(),
++            Self::CancelStreamLocalForward {
++                reply_channel,
++                socket_path,
++            } => f
++                .debug_struct("CancelStreamLocalForward")
++                .field("reply_channel", reply_channel)
++                .field("socket_path", socket_path)
++                .finish(),
++            Self::Close { id } => f.debug_struct("Close").field("id", id).finish(),
++            Self::Disconnect {
++                reason,
++                description,
++                language_tag,
++            } => f
++                .debug_struct("Disconnect")
++                .field("reason", reason)
++                .field("description", description)
++                .field("language_tag", language_tag)
++                .finish(),
++            Self::Channel(id, message) => f
++                .debug_tuple("Channel")
++                .field(id)
++                .field(message)
++                .finish(),
++            Self::ServerChannelOpenReply { pending, result } => f
++                .debug_struct("ServerChannelOpenReply")
++                .field("pending", pending)
++                .field("result", result)
++                .finish(),
++            Self::Rekey => f.write_str("Rekey"),
++            Self::AwaitExtensionInfo {
++                extension_name,
++                reply_channel,
++            } => f
++                .debug_struct("AwaitExtensionInfo")
++                .field("extension_name", extension_name)
++                .field("reply_channel", reply_channel)
++                .finish(),
++            Self::GetServerSigAlgs { reply_channel } => f
++                .debug_struct("GetServerSigAlgs")
++                .field("reply_channel", reply_channel)
++                .finish(),
++            Self::Keepalive { want_reply } => f
++                .debug_struct("Keepalive")
++                .field("want_reply", want_reply)
++                .finish(),
++            Self::Ping { reply_channel } => f
++                .debug_struct("Ping")
++                .field("reply_channel", reply_channel)
++                .finish(),
++            Self::NoMoreSessions { want_reply } => f
++                .debug_struct("NoMoreSessions")
++                .field("want_reply", want_reply)
++                .finish(),
++        }
++    }
++}
++
++impl Msg {
++    fn zeroize_secrets(&mut self) {
++        match self {
++            Self::AuthInfoResponse { responses } => responses.zeroize(),
++            _ => {}
++        }
++    }
++}
++
+@@ -276,0 +423 @@ pub struct Handle<H: Handler> {
++    secure_response_sender: Sender<Zeroizing<Vec<String>>>,
+@@ -321 +468 @@ impl<H: Handler> Handle<H> {
+-                    password: password.into(),
++                    password: Zeroizing::new(password.into()),
+@@ -362,2 +509,16 @@ impl<H: Handler> Handle<H> {
+-        self.sender
+-            .send(Msg::AuthInfoResponse { responses })
++        if let Err(error) = self.sender.send(Msg::AuthInfoResponse { responses }).await {
++            let mut message = error.0;
++            message.zeroize_secrets();
++            return Err(crate::Error::SendError);
++        }
++        self.wait_recv_keyboard_interactive_reply().await
++    }
++
++    /// Respond to an authentication information request with responses that
++    /// remain in a zeroizing container until they are encoded or discarded.
++    pub async fn authenticate_keyboard_interactive_respond_secure(
++        &mut self,
++        responses: Zeroizing<Vec<String>>,
++    ) -> Result<KeyboardInteractiveAuthResponse, crate::Error> {
++        self.secure_response_sender
++            .send(responses)
+@@ -1016,0 +1178 @@ where
++    let (secure_response_sender, secure_response_receiver) = channel(10);
+@@ -1043,0 +1206 @@ where
++        secure_response_receiver,
+@@ -1059,0 +1223 @@ where
++        secure_response_sender,
+@@ -1100,0 +1265 @@ impl Session {
++        secure_response_receiver: Receiver<Zeroizing<Vec<String>>>,
+@@ -1106,0 +1272 @@ impl Session {
++            secure_response_receiver,
+@@ -1349 +1515 @@ impl Session {
+-            Msg::AuthInfoResponse { .. } => {}
++            mut message @ Msg::AuthInfoResponse { .. } => message.zeroize_secrets(),
+@@ -1758,0 +1925 @@ mod tests {
++        let (_secure_sender, secure_receiver) = channel(config.channel_buffer_size);
+@@ -1802,0 +1970 @@ mod tests {
++            secure_receiver,
+@@ -1811,0 +1980 @@ mod tests {
++        let (_secure_sender, secure_receiver) = channel(config.channel_buffer_size);
+@@ -1850,0 +2020 @@ mod tests {
++            secure_receiver,
+diff --git a/russh/src/keys/format/mod.rs b/russh/src/keys/format/mod.rs
+index 8a0fcea..b8a9659 100644
+--- a/russh/src/keys/format/mod.rs
++++ b/russh/src/keys/format/mod.rs
+@@ -4,0 +5 @@ use ssh_key::PrivateKey;
++use zeroize::Zeroizing;
+@@ -52 +53 @@ pub fn decode_secret_key(secret: &str, password: Option<&str>) -> Result<Private
+-    let secret = {
++    let secret = Zeroizing::new({
+@@ -54 +55 @@ pub fn decode_secret_key(secret: &str, password: Option<&str>) -> Result<Private
+-        let mut sec = String::new();
++        let mut sec = String::with_capacity(secret.len());
+@@ -98 +99 @@ pub fn decode_secret_key(secret: &str, password: Option<&str>) -> Result<Private
+-    };
++    });
+@@ -100 +101 @@ pub fn decode_secret_key(secret: &str, password: Option<&str>) -> Result<Private
+-    let secret = BASE64_MIME.decode(secret.as_bytes())?;
++    let secret = Zeroizing::new(BASE64_MIME.decode(secret.as_bytes())?);
+diff --git a/russh/src/keys/format/pkcs5.rs b/russh/src/keys/format/pkcs5.rs
+index 6771ac8..dbafd9c 100644
+--- a/russh/src/keys/format/pkcs5.rs
++++ b/russh/src/keys/format/pkcs5.rs
+@@ -2,0 +3 @@ use ssh_key::PrivateKey;
++use zeroize::Zeroizing;
+@@ -26,2 +27,4 @@ pub fn decode_pkcs5(
+-                let mut dec = secret.to_vec();
+-                c.decrypt_padded::<Pkcs7>(&mut dec)?.to_vec()
++                let mut dec = Zeroizing::new(secret.to_vec());
++                let plaintext_len = c.decrypt_padded::<Pkcs7>(&mut dec)?.len();
++                dec.truncate(plaintext_len);
++                dec
+diff --git a/russh/src/keys/mod.rs b/russh/src/keys/mod.rs
+index 01344dc..90ed97f 100644
+--- a/russh/src/keys/mod.rs
++++ b/russh/src/keys/mod.rs
+@@ -66,0 +67 @@ use thiserror::Error;
++use zeroize::Zeroizing;
+@@ -253,3 +254,18 @@ pub fn load_secret_key<P: AsRef<Path>>(
+-    let mut secret_file = std::fs::File::open(secret_)?;
+-    let mut secret = String::new();
+-    secret_file.read_to_string(&mut secret)?;
++    let secret_file = std::fs::File::open(secret_)?;
++    let file_len = usize::try_from(secret_file.metadata()?.len()).map_err(|_| {
++        std::io::Error::new(std::io::ErrorKind::InvalidData, "secret key file is too large")
++    })?;
++    let capacity = file_len.checked_add(1).ok_or_else(|| {
++        std::io::Error::new(std::io::ErrorKind::InvalidData, "secret key file is too large")
++    })?;
++    let mut secret = Zeroizing::new(String::with_capacity(capacity));
++    let bytes_read = secret_file
++        .take(capacity as u64)
++        .read_to_string(&mut secret)?;
++    if bytes_read > file_len {
++        return Err(std::io::Error::new(
++            std::io::ErrorKind::InvalidData,
++            "secret key file changed while reading",
++        )
++        .into());
++    }

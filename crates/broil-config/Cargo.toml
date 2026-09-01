@@ -1,0 +1,13 @@
+[package]
+name = "broil-config"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+broil-core = { path = "../broil-core" }
+saphyr = "0.0.11"
+
+[dev-dependencies]
+tempfile.workspace = true

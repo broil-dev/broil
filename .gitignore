@@ -1,0 +1,23 @@
+AGENTS.md
+CLAUDE.md
+.claude/
+.codex/
+.local/
+
+# Rust
+/target
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Vim
+[._]*.sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
