@@ -76,6 +76,7 @@ use crate::{
 };
 
 mod encrypted;
+pub mod private;
 mod kex;
 mod session;
 
@@ -98,6 +99,7 @@ pub struct Session {
     target_window_size: u32,
     pending_reads: Vec<Vec<u8>>,
     pending_len: u32,
+    private: Option<private::PrivateState>,
     inbound_channel_sender: Sender<Msg>,
     inbound_channel_receiver: Receiver<Msg>,
     open_global_requests: VecDeque<GlobalRequestResponse>,
@@ -1240,6 +1242,16 @@ async fn start_reading<R: AsyncRead + Unpin>(
 
 impl Session {
     fn maybe_decompress(&mut self, buffer: &SSHBuffer) -> Result<IncomingSshPacket, Error> {
+        if self.private.is_some() {
+            let encrypted = self.common.encrypted.as_ref().ok_or(Error::Inconsistent)?;
+            if !matches!(encrypted.decompress, crate::compression::Decompress::None) {
+                return Err(Error::Inconsistent);
+            }
+            return Ok(IncomingSshPacket {
+                buffer: private::guarded(buffer.buffer.get(5..).ok_or(Error::Inconsistent)?)?,
+                seqn: buffer.seqn,
+            });
+        }
         if let Some(ref mut enc) = self.common.encrypted {
             let mut decomp = Vec::new();
             Ok(IncomingSshPacket {
@@ -1247,13 +1259,13 @@ impl Session {
                 buffer: enc.decompress.decompress(
                     &buffer.buffer[5..],
                     &mut decomp,
-                )?.into(),
+                )?.to_vec().into(),
                 seqn: buffer.seqn,
             })
         } else {
             Ok(IncomingSshPacket {
                 #[allow(clippy::indexing_slicing)] // length checked
-                buffer: buffer.buffer[5..].into(),
+                buffer: buffer.buffer[5..].to_vec().into(),
                 seqn: buffer.seqn,
             })
         }
@@ -1279,6 +1291,7 @@ impl Session {
             channels: HashMap::new(),
             pending_reads: Vec::new(),
             pending_len: 0,
+            private: None,
             open_global_requests: VecDeque::new(),
             server_sig_algs: None,
         }
@@ -1383,7 +1396,9 @@ impl Session {
                     let mut pkt = self.maybe_decompress(&buffer)?;
                     if !pkt.buffer.is_empty() {
                         #[allow(clippy::indexing_slicing)] // length checked
-                        if pkt.buffer[0] == crate::msg::DISCONNECT {
+                        if self.private.is_some() {
+                            self.read_private(handler, &pkt.buffer).await?;
+                        } else if pkt.buffer[0] == crate::msg::DISCONNECT {
                             debug!("received disconnect");
                             result = self.process_disconnect(&pkt).map_err(H::Error::from);
                         } else {
@@ -1508,6 +1523,14 @@ impl Session {
     }
 
     fn handle_msg(&mut self, msg: Msg) -> Result<(), crate::Error> {
+        // No ordinary channel or global request may enter a private connection.
+        if self.private.is_some() && matches!(&msg,
+            Msg::ChannelOpenX11 { .. } | Msg::ChannelOpenDirectTcpIp { .. }
+            | Msg::ChannelOpenDirectStreamLocal { .. } | Msg::TcpIpForward { .. }
+            | Msg::CancelTcpIpForward { .. } | Msg::StreamLocalForward { .. }
+            | Msg::CancelStreamLocalForward { .. } | Msg::Keepalive { .. }
+            | Msg::Ping { .. } | Msg::NoMoreSessions { .. })
+        { return Err(Error::Inconsistent); }
         match msg {
             Msg::Authenticate { user, method } => {
                 self.write_auth_request_if_needed(&user, method)?;
@@ -1515,7 +1538,21 @@ impl Session {
             Msg::Signed { .. } => {}
             mut message @ Msg::AuthInfoResponse { .. } => message.zeroize_secrets(),
             Msg::ChannelOpenSession { channel_ref } => {
+                if channel_ref.private.is_some() {
+                    if !self.channels.is_empty() || self.kex.active()
+                        || !self.pending_reads.is_empty() || self.common.has_any_pending_data()
+                        || !self.open_global_requests.is_empty()
+                    { return Err(Error::Inconsistent); }
+                    let enc = self.common.encrypted.as_ref().ok_or(Error::Inconsistent)?;
+                    if !matches!(enc.state, EncryptedState::Authenticated)
+                        || !matches!(enc.decompress, crate::compression::Decompress::None)
+                    { return Err(Error::Inconsistent); }
+                    if self.private.is_none() { self.private = Some(private::PrivateState::default()); }
+                } else if self.private.is_some() { return Err(Error::Inconsistent); }
                 let id = self.channel_open_session()?;
+                if let Some(profile) = channel_ref.private {
+                    self.private.as_mut().ok_or(Error::Inconsistent)?.admit(id, profile)?;
+                }
                 self.channels.insert(id, channel_ref);
             }
             Msg::ChannelOpenX11 {
@@ -1729,6 +1766,7 @@ impl Session {
     }
 
     fn begin_rekey(&mut self) -> Result<(), crate::Error> {
+        if self.private.is_some() { return Err(Error::Inconsistent); }
         debug!("beginning re-key");
         let mut kex = ClientKex::new(
             self.common.config.clone(),

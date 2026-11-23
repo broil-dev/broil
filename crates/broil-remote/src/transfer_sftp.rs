@@ -77,6 +77,38 @@ pub struct TransferPrivilegeContext {
 }
 
 impl TransferPrivilegeContext {
+    pub fn with_store_context(mut self, store: crate::secret::StoreContext) -> Self {
+        if self.privilege_profiles.values().any(|profile| {
+            profile
+                .password
+                .as_ref()
+                .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+        }) {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_store_context_for_profiles(
+        mut self,
+        store: crate::secret::StoreContext,
+        profiles: &[&str],
+    ) -> Self {
+        if profiles
+            .iter()
+            .filter_map(|name| self.privilege_profiles.get(*name))
+            .any(|profile| {
+                profile
+                    .password
+                    .as_ref()
+                    .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+            })
+        {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
     pub fn from_project(
         project: &LoadedProject,
         environment: &str,
@@ -1125,6 +1157,100 @@ pub(crate) async fn provision_sftp_gate_probe(
     Ok(())
 }
 
+pub(crate) async fn builder_upload_reserved(
+    sftp: &russh_sftp::client::RawSftpSession,
+    job: &TransferJob,
+    extensions: &BTreeMap<String, String>,
+    temporary: &str,
+    expected_size: u64,
+    cancel: &CancellationToken,
+) -> Result<(), FailureClass> {
+    if job.direction != TransferDirection::Upload
+        || job.recursive
+        || job.overwrite
+        || job.privilege.is_some()
+        || job.owner.is_some()
+        || job.mode.as_deref() != Some("0600")
+    {
+        return Err(FailureClass::Configuration);
+    }
+    let paths = preflight_transfer_paths(job).map_err(|_| FailureClass::TransferPathSafety)?;
+    let source = UploadSource::open(&paths.local).map_err(|_| FailureClass::TransferPathSafety)?;
+    if source.size != expected_size {
+        return Err(FailureClass::TransferPathSafety);
+    }
+    let final_path = paths.remote.path();
+    let (parent, name) = final_path
+        .rsplit_once('/')
+        .ok_or(FailureClass::Configuration)?;
+    if !matches!(name, "archive" | "ca") || temporary != format!("{parent}/upload.tmp") {
+        return Err(FailureClass::Configuration);
+    }
+    let mut context = TransferRequestContext::new(sftp, job, cancel.clone());
+    context.reserved_temporary = Some(temporary.to_string());
+    let remote = context
+        .resolve_remote_operand(&paths.remote)
+        .await
+        .map_err(|e| e.class)?;
+    context
+        .upload_single_file(job, source, &remote, extensions, Some(0o600))
+        .await
+        .map_err(|e| {
+            e.into_result(job)
+                .failure_class
+                .unwrap_or(FailureClass::IndeterminateAfterDispatch)
+        })
+}
+
+pub(crate) async fn k3s_upload_reserved(
+    sftp: &russh_sftp::client::RawSftpSession,
+    job: &TransferJob,
+    extensions: &BTreeMap<String, String>,
+    temporary: &str,
+    expected_size: u64,
+    cancel: &CancellationToken,
+) -> Result<(), FailureClass> {
+    if job.direction != TransferDirection::Upload
+        || job.recursive
+        || job.overwrite
+        || job.privilege.is_some()
+        || job.owner.is_some()
+        || job.mode.as_deref() != Some("0600")
+    {
+        return Err(FailureClass::Configuration);
+    }
+    let paths = preflight_transfer_paths(job).map_err(|_| FailureClass::TransferPathSafety)?;
+    let source = UploadSource::open(&paths.local).map_err(|_| FailureClass::TransferPathSafety)?;
+    if source.size != expected_size {
+        return Err(FailureClass::TransferPathSafety);
+    }
+    let final_path = paths.remote.path();
+    let (parent, name) = final_path
+        .rsplit_once('/')
+        .ok_or(FailureClass::Configuration)?;
+    if name != "received"
+        || !parent.starts_with("/var/lib/broil-k3s-incoming/")
+        || !parent.ends_with("/data")
+        || temporary != format!("{parent}/upload.tmp")
+    {
+        return Err(FailureClass::Configuration);
+    }
+    let mut context = TransferRequestContext::new(sftp, job, cancel.clone());
+    context.reserved_temporary = Some(temporary.to_string());
+    let remote = context
+        .resolve_remote_operand(&paths.remote)
+        .await
+        .map_err(|e| e.class)?;
+    context
+        .upload_single_file(job, source, &remote, extensions, Some(0o600))
+        .await
+        .map_err(|e| {
+            e.into_result(job)
+                .failure_class
+                .unwrap_or(FailureClass::IndeterminateAfterDispatch)
+        })
+}
+
 pub(crate) async fn provision_transfer_target(
     session: &mut client::Handle<StrictHandler>,
     root_authenticated: bool,
@@ -1299,6 +1425,7 @@ pub(crate) struct ResolvedRemotePath {
 struct TransferRequestContext<'a> {
     raw_sftp: &'a russh_sftp::client::RawSftpSession,
     cancel: CancellationToken,
+    reserved_temporary: Option<String>,
 }
 
 impl<'a> TransferRequestContext<'a> {
@@ -1308,7 +1435,11 @@ impl<'a> TransferRequestContext<'a> {
         cancel: CancellationToken,
     ) -> Self {
         raw_sftp.set_timeout(job.transfer_timeout.seconds);
-        Self { raw_sftp, cancel }
+        Self {
+            raw_sftp,
+            cancel,
+            reserved_temporary: None,
+        }
     }
 
     async fn resolve_remote_operand(
@@ -1388,7 +1519,10 @@ impl<'a> TransferRequestContext<'a> {
                 }
             }
         }
-        let temp_path = same_directory_temp_path(&destination.parent)?;
+        let temp_path = match &self.reserved_temporary {
+            Some(path) => path.clone(),
+            None => same_directory_temp_path(&destination.parent)?,
+        };
         let handle = match self.open_upload_temp(&temp_path).await {
             Ok(handle) => handle,
             Err(error) if error.possibly_created_temp() => {

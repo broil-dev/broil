@@ -1,7 +1,0 @@
-pristine_guard_build=ok
-pristine_guard_exit=101
-pristine_guard_assertion_line=test auth_info_response_debug_is_redacted ... FAILED
-pristine_guard_sentinel=absent
-vendor_response_debug_guard=ok
-vendor_password_debug_guard=ok
-vendor_phase4_callpath_guard=ok

@@ -391,7 +391,7 @@ impl Session {
         Ok(())
     }
 
-    async fn client_read_authenticated<H: Handler>(
+    pub(super) async fn client_read_authenticated<H: Handler>(
         &mut self,
         client: &mut H,
         buf: &[u8],

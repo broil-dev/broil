@@ -1,3 +1,5 @@
+// Modified by the Broil project from russh 0.62.5; see LICENSE.txt and docs/provenance/russh-0.62.5.md for provenance.
+
 use std::collections::{HashMap, VecDeque};
 use std::io::ErrorKind;
 use std::sync::Arc;
@@ -477,13 +479,13 @@ impl Session {
                 buffer: enc.decompress.decompress(
                     &buffer.buffer[5..],
                     &mut decomp,
-                )?.into(),
+                )?.to_vec().into(),
                 seqn: buffer.seqn,
             })
         } else {
             Ok(IncomingSshPacket {
                 #[allow(clippy::indexing_slicing)] // length checked
-                buffer: buffer.buffer[5..].into(),
+                buffer: buffer.buffer[5..].to_vec().into(),
                 seqn: buffer.seqn,
             })
         }

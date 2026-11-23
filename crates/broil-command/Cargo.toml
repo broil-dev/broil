@@ -6,9 +6,22 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+base64ct = { version = "=1.8.3", default-features = false }
+broil-secrets = { path = "../broil-secrets" }
 broil-config = { path = "../broil-config" }
 broil-core = { path = "../broil-core" }
 broil-remote = { path = "../broil-remote" }
-rustix = { version = "1", features = ["fs"] }
+rustix = { version = "1", features = ["fs", "process", "time"] }
+saphyr-parser = { path = "../vendor/saphyr-parser-0.0.11", version = "=0.0.11" }
 serde_json.workspace = true
 tempfile.workspace = true
+tokio = { version = "=1.53.3", features = ["process"] }
+zeroize = "=1.9.0"
+sha2 = { version = "=0.11.0", default-features = false, features = ["zeroize"] }
+
+[dev-dependencies]
+tokio = { version = "=1.53.3", features = ["test-util"] }
+
+[[bin]]
+name = "broil-image-client-worker"
+path = "src/image_client_worker.rs"

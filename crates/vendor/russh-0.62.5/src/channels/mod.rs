@@ -1,3 +1,5 @@
+// Modified by the Broil project from russh 0.62.5; see LICENSE.txt and docs/provenance/russh-0.62.5.md for provenance.
+
 use std::sync::Arc;
 
 use bytes::Bytes;
@@ -483,6 +485,7 @@ impl<S: From<(ChannelId, ChannelMsg)> + Send + Sync + 'static> Channel<S> {
             },
             ChannelRef {
                 sender: tx,
+                private: None,
                 window_size,
             },
         )

@@ -1,0 +1,46 @@
+tools:
+  filesystem_helper: /opt/broil/bin/broil-image-client-worker
+  registry: /opt/broil/bin/image-registry
+  analyzer: /opt/broil/bin/image-analyzer
+  buildx: /opt/broil/bin/docker-buildx
+  buildctl: /opt/broil/bin/buildctl
+builders:
+  shared:
+    kind: external
+    endpoint: tcp://builder.example.test:1234
+    tls:
+      ca: tls/builder-ca.pem
+      server_name: builder.example.test
+      certificate: {set: demo/ci, key: builder_certificate}
+      key: {set: demo/ci, key: builder_key}
+registries:
+  release:
+    endpoint: https://registry.example.test
+images:
+  base:
+    image: registry.example.test/demo/base:dev
+    builder: shared
+    registry: release
+    context: base
+    platforms: [linux/amd64, linux/arm64]
+    output: {type: oci-layout, path: retained/base}
+  app:
+    image: registry.example.test/demo/app:dev
+    builder: shared
+    registry: release
+    context: app
+    platforms: [linux/amd64, linux/arm64]
+secrets:
+  store: broil/secrets
+  project: demo
+environments:
+  ci:
+    tools:
+      registry: /opt/broil-ci/bin/image-registry
+    images:
+      app:
+        image: registry.example.test/demo/app:ci
+        builder: shared
+        registry: release
+        context: app
+        platforms: [linux/amd64, linux/arm64]

@@ -1,0 +1,952 @@
+{
+  "schema": 1,
+  "status": "unadopted-published-addon-inputs",
+  "cert_manager_manifest": {
+    "url": "https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml",
+    "size": 1034400,
+    "sha256": "e03b668ec8675214af6b0a671699d088f2601fa3878e0dbe1b41d3feafd1879f",
+    "resources": [
+      [
+        "v1",
+        "Namespace",
+        null,
+        "cert-manager"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "challenges.acme.cert-manager.io"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "orders.acme.cert-manager.io"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "certificaterequests.cert-manager.io"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "certificates.cert-manager.io"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "clusterissuers.cert-manager.io"
+      ],
+      [
+        "apiextensions.k8s.io/v1",
+        "CustomResourceDefinition",
+        null,
+        "issuers.cert-manager.io"
+      ],
+      [
+        "v1",
+        "ServiceAccount",
+        "cert-manager",
+        "cert-manager-cainjector"
+      ],
+      [
+        "v1",
+        "ServiceAccount",
+        "cert-manager",
+        "cert-manager"
+      ],
+      [
+        "v1",
+        "ServiceAccount",
+        "cert-manager",
+        "cert-manager-webhook"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-cainjector"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-issuers"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-clusterissuers"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-certificates"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-orders"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-challenges"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-ingress-shim"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-cluster-view"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-view"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-edit"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-approve:cert-manager-io"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-controller-certificatesigningrequests"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRole",
+        null,
+        "cert-manager-webhook:subjectaccessreviews"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-cainjector"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-issuers"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-clusterissuers"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-certificates"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-orders"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-challenges"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-ingress-shim"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-approve:cert-manager-io"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-controller-certificatesigningrequests"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "ClusterRoleBinding",
+        null,
+        "cert-manager-webhook:subjectaccessreviews"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "Role",
+        "kube-system",
+        "cert-manager-cainjector:leaderelection"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "Role",
+        "kube-system",
+        "cert-manager:leaderelection"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "Role",
+        "cert-manager",
+        "cert-manager-webhook:dynamic-serving"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "RoleBinding",
+        "kube-system",
+        "cert-manager-cainjector:leaderelection"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "RoleBinding",
+        "kube-system",
+        "cert-manager:leaderelection"
+      ],
+      [
+        "rbac.authorization.k8s.io/v1",
+        "RoleBinding",
+        "cert-manager",
+        "cert-manager-webhook:dynamic-serving"
+      ],
+      [
+        "v1",
+        "Service",
+        "cert-manager",
+        "cert-manager-cainjector"
+      ],
+      [
+        "v1",
+        "Service",
+        "cert-manager",
+        "cert-manager"
+      ],
+      [
+        "v1",
+        "Service",
+        "cert-manager",
+        "cert-manager-webhook"
+      ],
+      [
+        "apps/v1",
+        "Deployment",
+        "cert-manager",
+        "cert-manager-cainjector"
+      ],
+      [
+        "apps/v1",
+        "Deployment",
+        "cert-manager",
+        "cert-manager"
+      ],
+      [
+        "apps/v1",
+        "Deployment",
+        "cert-manager",
+        "cert-manager-webhook"
+      ],
+      [
+        "admissionregistration.k8s.io/v1",
+        "MutatingWebhookConfiguration",
+        null,
+        "cert-manager-webhook"
+      ],
+      [
+        "admissionregistration.k8s.io/v1",
+        "ValidatingWebhookConfiguration",
+        null,
+        "cert-manager-webhook"
+      ]
+    ]
+  },
+  "images": {
+    "coredns": {
+      "registry": "registry-1.docker.io",
+      "repository": "coredns/coredns",
+      "runtime_repository": "docker.io/coredns/coredns",
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3023,
+        "digest": "sha256:2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3062,
+        "digest": "sha256:97efff2babf85310d6f87bd969ac64d7006bbbadb147c90579d68d57634750f4"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84784,
+          "digest": "sha256:ad7fcb30079d111d23da3e519d0dbb3105d283cd42f1da33cf2e2030c14e9b57"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12579,
+          "digest": "sha256:2e4cf50eeb92ac3a7afe75e15d96a26dee99449f86b46c75b5d95f4418a5bca0"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 463397,
+          "digest": "sha256:c36c4b61cfbac73652d6a28923cd773657fa593c6ba5634672941f33bd8b3656"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 28389,
+          "digest": "sha256:e1089d61b200106053b1717881bf0c1c47551478f01569d9224d33cccf3e4692"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 320,
+          "digest": "sha256:6b72b81ed96620b324f40ade069bbd3fcee69d62182bb03681c3976b6909eec4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 136427,
+          "digest": "sha256:77964957095d7872770920c8f55d28613e85f8e27aa0b157a440e0d635193fa9"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 23526263,
+          "digest": "sha256:99b3e33606b7d973e48aae22cef2c9531f934fcddac7c64b7d19852d579cd513"
+        }
+      ],
+      "index": {
+        "size": 2319,
+        "digest": "sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286"
+      }
+    },
+    "cert-manager-controller": {
+      "registry": "quay.io",
+      "repository": "jetstack/cert-manager-controller",
+      "runtime_repository": "quay.io/jetstack/cert-manager-controller",
+      "index": {
+        "digest": "sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8",
+        "size": 1728
+      },
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3647,
+        "digest": "sha256:57bb397c639e0e94184ba67848e5dad04284f24645e521e764a0ee5f5002f286",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3628,
+        "digest": "sha256:c16f1ae03cff7f778d67154d083849608122285c59dcba1efd37ceb70f811df8"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 86407,
+          "digest": "sha256:737574503653e907df404cf78bdc98196c47618702bebfd61067d51edf46add3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12777,
+          "digest": "sha256:5b3013706a463509f05fabda3a5f854b1c5f3429561cf9374db6e6681da5493f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 295494,
+          "digest": "sha256:8029962f461fbb244286e163b0b9888f6cdbed05bde2c1d35b797334e083d9c4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 263810,
+          "digest": "sha256:9cd8e28f1c221ec42ab2a136b882dd0f6f81e0b583b6f9b1c9f7a611fd9658bb"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 31908,
+          "digest": "sha256:9d2753d762cc58b055d94d102989775221df5156b7bec5861353454c308ad197"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 316,
+          "digest": "sha256:411e1c946a02ee44c9adc542515ae29ff58d65149a4a201cbd688297c9900ee4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 142345,
+          "digest": "sha256:799f0e3f433ddb87b6ab354ef5b6d998d6b49710f35ad7b12075a7eb0828e518"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 24053583,
+          "digest": "sha256:c5e8db4fec6bd5f6454cb1334c13577858ecc5d6bd88a7d64960c2ccec7aa4a8"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 631,
+          "digest": "sha256:5f7f8dceef6c5107918d816347e0356c98a8b91a81b81acfe58fd369d5239207"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 267,
+          "digest": "sha256:934121b1dd7c105d6822b5aa689cd26d189299acc2a78deb1d3c2c59f87b136b"
+        }
+      ]
+    },
+    "cert-manager-cainjector": {
+      "registry": "quay.io",
+      "repository": "jetstack/cert-manager-cainjector",
+      "runtime_repository": "quay.io/jetstack/cert-manager-cainjector",
+      "index": {
+        "digest": "sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562",
+        "size": 1728
+      },
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3647,
+        "digest": "sha256:aa2bc58725d92a643f5069dde58abc93b65566ded8951348873ac9ee7efef66c",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3629,
+        "digest": "sha256:6a68bd9dea6981ea193d0aea778a2361187444f2312a4527fb5795a87358529a"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 86407,
+          "digest": "sha256:737574503653e907df404cf78bdc98196c47618702bebfd61067d51edf46add3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12777,
+          "digest": "sha256:5b3013706a463509f05fabda3a5f854b1c5f3429561cf9374db6e6681da5493f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 295494,
+          "digest": "sha256:8029962f461fbb244286e163b0b9888f6cdbed05bde2c1d35b797334e083d9c4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 263810,
+          "digest": "sha256:9cd8e28f1c221ec42ab2a136b882dd0f6f81e0b583b6f9b1c9f7a611fd9658bb"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 31908,
+          "digest": "sha256:9d2753d762cc58b055d94d102989775221df5156b7bec5861353454c308ad197"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 316,
+          "digest": "sha256:411e1c946a02ee44c9adc542515ae29ff58d65149a4a201cbd688297c9900ee4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 142345,
+          "digest": "sha256:799f0e3f433ddb87b6ab354ef5b6d998d6b49710f35ad7b12075a7eb0828e518"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 11556445,
+          "digest": "sha256:b8542f5a28e11fa45e25f59cb89e20e4f3093ee1702b600c0f21910ea0aedc78"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 631,
+          "digest": "sha256:5f7f8dceef6c5107918d816347e0356c98a8b91a81b81acfe58fd369d5239207"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 267,
+          "digest": "sha256:934121b1dd7c105d6822b5aa689cd26d189299acc2a78deb1d3c2c59f87b136b"
+        }
+      ]
+    },
+    "cert-manager-webhook": {
+      "registry": "quay.io",
+      "repository": "jetstack/cert-manager-webhook",
+      "runtime_repository": "quay.io/jetstack/cert-manager-webhook",
+      "index": {
+        "digest": "sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae",
+        "size": 1728
+      },
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3647,
+        "digest": "sha256:b929259301ee75270ab4651d5e6bd4ba7b6624b1ce48ba767d064295a9312101",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3608,
+        "digest": "sha256:3d69cb630da65b197538a4d830c98c6e335a77b8104bb27c137ddd1b0bd69c34"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 86407,
+          "digest": "sha256:737574503653e907df404cf78bdc98196c47618702bebfd61067d51edf46add3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12777,
+          "digest": "sha256:5b3013706a463509f05fabda3a5f854b1c5f3429561cf9374db6e6681da5493f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 295494,
+          "digest": "sha256:8029962f461fbb244286e163b0b9888f6cdbed05bde2c1d35b797334e083d9c4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 263810,
+          "digest": "sha256:9cd8e28f1c221ec42ab2a136b882dd0f6f81e0b583b6f9b1c9f7a611fd9658bb"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 31908,
+          "digest": "sha256:9d2753d762cc58b055d94d102989775221df5156b7bec5861353454c308ad197"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 316,
+          "digest": "sha256:411e1c946a02ee44c9adc542515ae29ff58d65149a4a201cbd688297c9900ee4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 142345,
+          "digest": "sha256:799f0e3f433ddb87b6ab354ef5b6d998d6b49710f35ad7b12075a7eb0828e518"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 18983854,
+          "digest": "sha256:a602026ee8d77c383fbcb45571507e2283a7255bdddbd2b8d4ca7b6197e36d1b"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 631,
+          "digest": "sha256:7c33a40a2715fce62d9e7235f8856e69ee2c5f9ac9dae35a2398cd55dd5860ae"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 267,
+          "digest": "sha256:80110a41c50c52c6090b6fc1a21f36ab18ac9d425e35f1aa83259f3970da30b0"
+        }
+      ]
+    },
+    "cert-manager-acmesolver": {
+      "registry": "quay.io",
+      "repository": "jetstack/cert-manager-acmesolver",
+      "runtime_repository": "quay.io/jetstack/cert-manager-acmesolver",
+      "index": {
+        "digest": "sha256:699b40d622211ab7accad8a21b04c5fbaa1841ef7a12621e8de492dbe27b2503",
+        "size": 1728
+      },
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3646,
+        "digest": "sha256:dc5c5b8456d1a50af47a240987e85afce352b5c1155a8a4698b7c91eac19f407",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3629,
+        "digest": "sha256:7e704703df191a385530295df2806ce5beba8fecc5ff5b57d5c7d77ed0fa4cfe"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 86407,
+          "digest": "sha256:737574503653e907df404cf78bdc98196c47618702bebfd61067d51edf46add3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12777,
+          "digest": "sha256:5b3013706a463509f05fabda3a5f854b1c5f3429561cf9374db6e6681da5493f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 295494,
+          "digest": "sha256:8029962f461fbb244286e163b0b9888f6cdbed05bde2c1d35b797334e083d9c4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 263810,
+          "digest": "sha256:9cd8e28f1c221ec42ab2a136b882dd0f6f81e0b583b6f9b1c9f7a611fd9658bb"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 31908,
+          "digest": "sha256:9d2753d762cc58b055d94d102989775221df5156b7bec5861353454c308ad197"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 316,
+          "digest": "sha256:411e1c946a02ee44c9adc542515ae29ff58d65149a4a201cbd688297c9900ee4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 142345,
+          "digest": "sha256:799f0e3f433ddb87b6ab354ef5b6d998d6b49710f35ad7b12075a7eb0828e518"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 5773830,
+          "digest": "sha256:056c7885ea7f66c15aa0ae53732507709fe88908a7d68e365893bc79bd6713f1"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 629,
+          "digest": "sha256:32e3765cb1dc157ab45fd0097c8022b368b33bf1ce6e1686df9f455defce5a11"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 267,
+          "digest": "sha256:bf1d950763bf486e8b7db08415443335b097c2a493dc869a686ae72e10d4c4e5"
+        }
+      ]
+    },
+    "cert-manager-startupapicheck": {
+      "registry": "quay.io",
+      "repository": "jetstack/cert-manager-startupapicheck",
+      "runtime_repository": "quay.io/jetstack/cert-manager-startupapicheck",
+      "index": {
+        "digest": "sha256:46e75b6866359ffb5d82624f41e3ed1c70b2994982702ced547ce5edb418a8f5",
+        "size": 1728
+      },
+      "manifest": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3647,
+        "digest": "sha256:ed347b0ab607058f139b83f41567109456b9776330b63da8086a120afb7f1729",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3592,
+        "digest": "sha256:084ea45928bc4aac819456751ec18e64818b205567ee6317335ee27c5fdc97ba"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 86407,
+          "digest": "sha256:737574503653e907df404cf78bdc98196c47618702bebfd61067d51edf46add3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12777,
+          "digest": "sha256:5b3013706a463509f05fabda3a5f854b1c5f3429561cf9374db6e6681da5493f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 295494,
+          "digest": "sha256:8029962f461fbb244286e163b0b9888f6cdbed05bde2c1d35b797334e083d9c4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 263810,
+          "digest": "sha256:9cd8e28f1c221ec42ab2a136b882dd0f6f81e0b583b6f9b1c9f7a611fd9658bb"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 31908,
+          "digest": "sha256:9d2753d762cc58b055d94d102989775221df5156b7bec5861353454c308ad197"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 75,
+          "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 193,
+          "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 130,
+          "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 168,
+          "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 84,
+          "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 358,
+          "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 316,
+          "digest": "sha256:411e1c946a02ee44c9adc542515ae29ff58d65149a4a201cbd688297c9900ee4"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 142345,
+          "digest": "sha256:799f0e3f433ddb87b6ab354ef5b6d998d6b49710f35ad7b12075a7eb0828e518"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 10674036,
+          "digest": "sha256:256d83767f62a77c5eb5bdcb8d06fbfda47a8239241f19e418f87513b35e6236"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 631,
+          "digest": "sha256:7ec3fc7c03216a7580b8c0f8f301ed2a36d321933cb0788fa4195fecf6ccad9f"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 267,
+          "digest": "sha256:93dfe2a28f53207029336156ca78315003523b83a9a1ec1b53a3078f979c5cda"
+        }
+      ]
+    },
+    "traefik": {
+      "registry": "registry-1.docker.io",
+      "repository": "library/traefik",
+      "runtime_repository": "docker.io/library/traefik",
+      "manifest": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:96780238b1bbda5a9bb997f4307ce69e798ad1cf6eb7f2dcc0a440823467d199",
+        "size": 1729
+      },
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:88d3f28abf1469b03faff610614e7c3699bf001b8c4e8b2079d059673d2f1bef",
+        "size": 3226
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:55afa1ecc21d2bb5e5045f32dafee56272ffd89860bac26f6c32123439af26a4",
+          "size": 3846391
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:1b2c07c2457261f12b89e98e4ca828f7f8d83d38ed9bb96c94a03eb347ff5b39",
+          "size": 408097
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:38c2e17c3837502b04279ede188e0df5c33f16a582dcc3f563c66be0e9e93f96",
+          "size": 50943593
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:7e5904896ac7557f158b6bc65b5a9a4cc20fcd84d7f1d3680509f9c2701495f7",
+          "size": 369
+        }
+      ],
+      "index": {
+        "size": 7714,
+        "digest": "sha256:f86a2cab1b5c649070c49f883c743dd32d8485a56e3368c5f93b9e91f1e91259"
+      }
+    }
+  },
+  "qualification": "Exact published input identities only. Operational, custody and configured advisory assessments remain required."
+}

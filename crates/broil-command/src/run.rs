@@ -19,6 +19,26 @@ pub fn execute(
     args: &[OsString],
     base_env: &[(OsString, OsString)],
 ) -> Result<i32, ExecutionError> {
+    execute_with_inputs(
+        broil_root,
+        config,
+        active,
+        script,
+        args,
+        base_env,
+        crate::injection::Inputs::borrowed(broil_root, base_env),
+    )
+}
+
+pub fn execute_with_inputs(
+    broil_root: &Path,
+    config: &BroilConfig,
+    active: Option<&OsStr>,
+    script: &OsStr,
+    args: &[OsString],
+    base_env: &[(OsString, OsString)],
+    inputs: crate::injection::Inputs<'_>,
+) -> Result<i32, ExecutionError> {
     let resolved = execenv::resolve(config, active)?;
     let Some(body) = script.to_str().and_then(|name| resolved.scripts.get(name)) else {
         return Err(ExecutionError::UnknownScript {
@@ -26,16 +46,17 @@ pub fn execute(
         });
     };
     let env = execenv::child_env(base_env, &resolved, broil_root);
-    let mut child = Command::new("bash")
+    let injection = crate::injection::Injection::resolve(config, broil_root, active, inputs)?;
+    let mut command = Command::new("bash");
+    command
         .arg("-c")
         .arg("--")
         .arg(body)
         .arg("dummy")
         .args(args)
-        .current_dir(broil_root)
-        .env_clear()
-        .envs(&env)
-        .spawn()
+        .current_dir(broil_root);
+    let mut child = injection
+        .spawn(command, &env)
         .map_err(|error| spawn_error("run", error))?;
     let status = child
         .wait()

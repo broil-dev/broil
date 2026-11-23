@@ -27,6 +27,7 @@ built-in or alias is selected.
 | `env` | `env --help`; otherwise `env <name>` for any first operand | bare `env` |
 | `get` | `get --help`, `get root`, `get name`, `get cfg <dot.path>` | bare `get`, missing or unknown selector |
 | `remote` | `remote --help`, `remote <verb> --help`, recognized `remote <verb>` | bare `remote`, unknown second token |
+| `image` | Immediate group/leaf `--help`; the thirteen [image leaves](images.md) | Bare `image`, `image record`, `image builder`; unknown or option-shaped group descendant |
 | `help` | `help [topic]` | none |
 | `version` | `version` | none |
 | root shorthand | `--help`, `--version` | none |
@@ -50,6 +51,8 @@ Partial built-ins continue to aliases and executable commands:
 | File `broil/bin/get/nodes` | `broil get nodes` | Executable, when no alias leaf completes |
 | Top-level alias leaf `run` | `broil run` | Alias leaf |
 | Alias child `run.quick` | `broil run quick` | Built-in `run <script>` |
+| Alias child `image.build` or file `broil/bin/image/build` | `broil image build` | Built-in, including its missing-operand error |
+| Alias leaf `image.record` | `broil image record` | Alias leaf; the built-in path is a group |
 
 A shorter alias leaf wins before executable lookup when no built-in completes.
 For example, alias leaf `db` receives `migrate` from `broil db migrate` and

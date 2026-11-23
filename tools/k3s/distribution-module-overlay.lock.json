@@ -1,0 +1,830 @@
+{
+  "schema": 1,
+  "source_commit": "9a8d98b679740cd514aa7e7d84d23d442a5ef54c",
+  "derived_build_version": "3.1.1+broil.otel144",
+  "patch": {
+    "file": "distribution-modules.patch",
+    "sha256": "8955813924e0bd157f6e2ecbc80e70c6d7aaa3b281fe89f139d65bf7564f222c",
+    "size": 3421
+  },
+  "base_files": {
+    "go.mod": {
+      "sha256": "c95fafbcabeef10e02f32f5b0863c943b585f34d9156a4a0e28e610a00fc44b1",
+      "size": 6496
+    },
+    "go.sum": {
+      "sha256": "f09e7c1be5ffe27cec16d932185757683e5323cca8a99da6a15f89c3f4437198",
+      "size": 42691
+    }
+  },
+  "derived_files": {
+    "go.mod": {
+      "sha256": "eed48ef1822a176fc55764c5b4d4329160b7452dbf917121f2d86a2e90fc979b",
+      "size": 6496
+    },
+    "go.sum": {
+      "sha256": "81047aad4223178e3eda60c62bd409f325084fac3473b158da240ebfaab0c4a0",
+      "size": 43224
+    }
+  },
+  "modules": [
+    {
+      "module": "go.opentelemetry.io/otel",
+      "version": "v1.44.0",
+      "inputs": {
+        "info": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/@v/v1.44.0.info",
+          "size": 209,
+          "sha256": "11c81234ccfb0528043ec5a8184309be4cf892bf7837c9d94b4d81674b4af4d0",
+          "file": "otel.info"
+        },
+        "mod": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/@v/v1.44.0.mod",
+          "size": 635,
+          "sha256": "f466441934839f12a009415b4c16a77d221e1aa5d767f878e2af5888f1ad839f",
+          "file": "otel.mod"
+        },
+        "zip": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/@v/v1.44.0.zip",
+          "size": 3561245,
+          "sha256": "4b7ef50caaf3dc6fc1a058f9ce2ccda6aad2ab3e8657acc4c8bb3102f79c53bc",
+          "file": "otel.zip"
+        }
+      },
+      "sumdb": {
+        "url": "https://sum.golang.org/lookup/go.opentelemetry.io/otel@v1.44.0",
+        "sha256": "952c1606265e5c7467f8408948f9bc6e256cdd719a79f65d42001ee2c33787cb",
+        "file": "otel.sumdb"
+      },
+      "sums": [
+        "go.opentelemetry.io/otel v1.44.0 h1:JjwHmHpA4iZ3wBxluu2fbbE7j4kqlE8jXyAyPXH7HqU=",
+        "go.opentelemetry.io/otel v1.44.0/go.mod h1:BMgjTHL9WPRlRjL2oZCBTL4whCGtXch2H4BhOPIAyYc="
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/otel/metric",
+      "version": "v1.44.0",
+      "inputs": {
+        "info": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/metric/@v/v1.44.0.info",
+          "size": 234,
+          "sha256": "aa05b63561fbb844cf7d87e956796906020a7c7ff3dcd314f2524caff95c1541",
+          "file": "metric.info"
+        },
+        "mod": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/metric/@v/v1.44.0.mod",
+          "size": 612,
+          "sha256": "328a1fe2bc702b8c26765f18a9a26fc08748283bdbba26d538d4037b0fcb6afb",
+          "file": "metric.mod"
+        },
+        "zip": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/metric/@v/v1.44.0.zip",
+          "size": 37850,
+          "sha256": "4442ba5f269f81251f549acb14ac16176f23967f4a0706163440b0df91592f96",
+          "file": "metric.zip"
+        }
+      },
+      "sumdb": {
+        "url": "https://sum.golang.org/lookup/go.opentelemetry.io/otel/metric@v1.44.0",
+        "sha256": "0b31947103dcae42d12404b5419ba199d0f0d511a17396c474f1568d9526a19d",
+        "file": "metric.sumdb"
+      },
+      "sums": [
+        "go.opentelemetry.io/otel/metric v1.44.0 h1:1w0gILTcHdr3YI+ixLyjemwrVnsMURbTZFrSYCdDdmc=",
+        "go.opentelemetry.io/otel/metric v1.44.0/go.mod h1:8O7hanEPBNgEMmybD3s2VBKcgWOCsA6tzHBPODAiquo="
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/otel/trace",
+      "version": "v1.44.0",
+      "inputs": {
+        "info": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/trace/@v/v1.44.0.info",
+          "size": 232,
+          "sha256": "997138a118c66ac4cc4e08ce286332598b8c37760efad5d48550954873d914d6",
+          "file": "trace.info"
+        },
+        "mod": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/trace/@v/v1.44.0.mod",
+          "size": 457,
+          "sha256": "24b803fb358fb3456f788a98a7c18fb391685bc5a708a118f02116b8969a03c4",
+          "file": "trace.mod"
+        },
+        "zip": {
+          "url": "https://proxy.golang.org/go.opentelemetry.io/otel/trace/@v/v1.44.0.zip",
+          "size": 76671,
+          "sha256": "cd1abf8dcec62fe9788fae9105760db1711e6e994d2e31cdda57ccb467e7ceec",
+          "file": "trace.zip"
+        }
+      },
+      "sumdb": {
+        "url": "https://sum.golang.org/lookup/go.opentelemetry.io/otel/trace@v1.44.0",
+        "sha256": "8a1869f70ace62d7bbf8669754a0fe86b3b6e9de7eb19ad5ce3c91e12beb6777",
+        "file": "trace.sumdb"
+      },
+      "sums": [
+        "go.opentelemetry.io/otel/trace v1.44.0 h1:jxF5CsGYCe74MCRx2X4g7WsY/VBKRqqpNvXlX/6gtIk=",
+        "go.opentelemetry.io/otel/trace v1.44.0/go.mod h1:oLl1jrMQAVo6v3GAggN+1VH9VIz9iUSvW53sW1Q8PIE="
+      ]
+    }
+  ],
+  "selected_modules": [
+    {
+      "GoModSum": "h1:l7XeiD//vx5lfqE3RavfmU9yvk5Pp0Zhcv482poyafY=",
+      "Path": "cloud.google.com/go/storage",
+      "Sum": "h1:3TbVkzTooBvnZsk7WaAQfOsNrdoM8QHusXA1cpk6QJs=",
+      "Version": "v1.50.0"
+    },
+    {
+      "GoModSum": "h1:i9fr2JpcEcY/IHEvzCM3qXUZYOQHgR89dt4es1CgMhc=",
+      "Path": "github.com/AdaLogics/go-fuzz-headers",
+      "Sum": "h1:d+pBUmsteW5tM87xmVXHZ4+LibHRFn40SPAoZJOg2ak=",
+      "Version": "v0.0.0-20221103172237-443f56ff4ba8"
+    },
+    {
+      "GoModSum": "h1:zGqV2R4Cr/k8Uye5w+dgQ06WJtEcbQG/8J7BB6hnCr4=",
+      "Path": "github.com/Azure/azure-sdk-for-go/sdk/azcore",
+      "Sum": "h1:DSDNVxqkoXJiko6x8a90zidoYqnYYa6c1MTzDKzKkTo=",
+      "Version": "v1.17.1"
+    },
+    {
+      "GoModSum": "h1:SqINnQ9lVVdRlyC8cd1lCI0SdX4n2paeABd2K8ggfnE=",
+      "Path": "github.com/Azure/azure-sdk-for-go/sdk/azidentity",
+      "Sum": "h1:F0gBpfdPLGsw+nsgk6aqqkZS1jiixa5WwFe3fk/T3Ys=",
+      "Version": "v1.8.2"
+    },
+    {
+      "GoModSum": "h1:cTvi54pg19DoT07ekoeMgE/taAwNtCShVeZqA+Iv2xI=",
+      "Path": "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob",
+      "Sum": "h1:UXT0o77lXQrikd1kgwIPQOUect7EoR/+sbP4wQKdzxM=",
+      "Version": "v1.6.0"
+    },
+    {
+      "GoModSum": "h1:TcL7YfarKPGDAthEtl5NBeHZfeUQj6OXMm/+iu5cLMM=",
+      "Path": "github.com/alicebob/miniredis/v2",
+      "Sum": "h1:QwLphYqCEAo1eu1TqPRN2jgVMPBweeQcR21jeqDCONI=",
+      "Version": "v2.35.0"
+    },
+    {
+      "GoModSum": "h1:eRwEWoyTWFMVYVQzKMNHWP5/RV4xIUGMQfXQHfHkpNU=",
+      "Path": "github.com/aws/aws-sdk-go",
+      "Sum": "h1:KKUZBfBoyqy5d3swXyiC7Q76ic40rYcbqH7qjh59kzU=",
+      "Version": "v1.55.5"
+    },
+    {
+      "GoModSum": "h1:Q2aXOe7rNuPgbBtPCOzYyWDvKX7+FpxE5sRdvcPoui0=",
+      "Path": "github.com/bshuster-repo/logrus-logstash-hook",
+      "Sum": "h1:o2FzZifLg+z/DN1OFmzTWzZZx/roaqt8IPZCIVco8r4=",
+      "Version": "v1.1.0"
+    },
+    {
+      "GoModSum": "h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=",
+      "Path": "github.com/coreos/go-systemd/v22",
+      "Sum": "h1:RrqgGjYQKalulkV8NGVIfkXQf6YYmOyiJKk8iXXhfZs=",
+      "Version": "v22.5.0"
+    },
+    {
+      "GoModSum": "h1:BbU0aIcezP1/5jX/8MP0YiH4SdvB5Y4f/wlDRiLyi3E=",
+      "Path": "github.com/distribution/reference",
+      "Sum": "h1:0IXCQ5g4/QMHHkarYzh5l+u8T3t73zM5QvfrDyIgxBk=",
+      "Version": "v0.6.0"
+    },
+    {
+      "GoModSum": "h1:v1S+hepowrQXITkEfw6o4+BMbGot02wiKpzWhGUZK6c=",
+      "Path": "github.com/docker/docker-credential-helpers",
+      "Sum": "h1:EFNN8DHvaiK8zVqFA2DT6BjXE0GzfLOZ38ggPTKePkY=",
+      "Version": "v0.9.5"
+    },
+    {
+      "GoModSum": "h1:Uw6UezgYA44ePAFQYUehOuCzmy5zmg/+nl2ZfMWGkpA=",
+      "Path": "github.com/docker/go-events",
+      "Sum": "h1:yOn6Ze6IbYI/KAw2lw/83ELYvZh6hvsygTVkD0dzMC4=",
+      "Version": "v0.0.0-20250808211157-605354379745"
+    },
+    {
+      "GoModSum": "h1:cG1hvH2utMXtqgqqYE9plW6lDxS3/5ayHzueweSI3Vw=",
+      "Path": "github.com/docker/go-metrics",
+      "Sum": "h1:AgB/0SvBxihN0X8OR4SjsblXkbMvalQ8cjmtKQ2rQV8=",
+      "Version": "v0.0.1"
+    },
+    {
+      "GoModSum": "h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=",
+      "Path": "github.com/go-jose/go-jose/v4",
+      "Sum": "h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=",
+      "Version": "v4.1.4"
+    },
+    {
+      "GoModSum": "h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=",
+      "Path": "github.com/google/uuid",
+      "Sum": "h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=",
+      "Version": "v1.6.0"
+    },
+    {
+      "GoModSum": "h1:dX+xVpaxdSw+q0Qek8SSsl3dfMk3jNddUkMzo0GtH0w=",
+      "Path": "github.com/gorilla/handlers",
+      "Sum": "h1:cLTUSsNkgcwhgRqvCNmdbRWG0A3N4F+M2nWKdScwyEE=",
+      "Version": "v1.5.2"
+    },
+    {
+      "GoModSum": "h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=",
+      "Path": "github.com/gorilla/mux",
+      "Sum": "h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=",
+      "Version": "v1.8.1"
+    },
+    {
+      "GoModSum": "h1:ny6zBSQZi2JxIeYcv7kt2sH2PXJtirBN7RDhRpxPkxU=",
+      "Path": "github.com/hashicorp/golang-lru/arc/v2",
+      "Sum": "h1:l2zaLDubNhW4XO3LnliVj0GXO3+/CGNJAg1dcN2Fpfw=",
+      "Version": "v2.0.5"
+    },
+    {
+      "GoModSum": "h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=",
+      "Path": "github.com/klauspost/compress",
+      "Sum": "h1:RPhnKRAQ4Fh8zU2FY/6ZFDwTVTxgJ/EMydqSTzE9a2c=",
+      "Version": "v1.18.4"
+    },
+    {
+      "GoModSum": "h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=",
+      "Path": "github.com/mitchellh/mapstructure",
+      "Sum": "h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=",
+      "Version": "v1.5.0"
+    },
+    {
+      "GoModSum": "h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=",
+      "Path": "github.com/opencontainers/go-digest",
+      "Sum": "h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=",
+      "Version": "v1.0.0"
+    },
+    {
+      "GoModSum": "h1:qpqAh3Dmcf36wStyyWU+kCeDgrGnAve2nCC8+7h8Q0M=",
+      "Path": "github.com/opencontainers/image-spec",
+      "Sum": "h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=",
+      "Version": "v1.1.1"
+    },
+    {
+      "GoModSum": "h1:WZjPDy7VNzn77AAfnAfVjZNvfJTYfPetfZk5yoSTLaQ=",
+      "Path": "github.com/redis/go-redis/extra/redisotel/v9",
+      "Sum": "h1:EfpWLLCyXw8PSM2/XNJLjI3Pb27yVE+gIAfeqp8LUCc=",
+      "Version": "v9.0.5"
+    },
+    {
+      "GoModSum": "h1:bGUrSggJ9X9GUmZpZNEOQKaANxSGgOEBRltRTZHSvrA=",
+      "Path": "github.com/redis/go-redis/v9",
+      "Sum": "h1:YpPyAayJV+XErNsatSElgRZZVCwXX9QzkKYNvO7x0wM=",
+      "Version": "v9.7.3"
+    },
+    {
+      "GoModSum": "h1:ftWc9WdOfJ0a92nsE2jF5u5ZwH8Bv2zdeOC42RjbV2g=",
+      "Path": "github.com/sirupsen/logrus",
+      "Sum": "h1:TsZE7l11zFCLZnZ+teH4Umoq5BhEIfIzfRDZ1Uzql2w=",
+      "Version": "v1.9.4"
+    },
+    {
+      "GoModSum": "h1:7C1pvHqHw5A4vrJfjNwvOdzYu0Gml16OCs2GRiTUUS4=",
+      "Path": "github.com/spf13/cobra",
+      "Sum": "h1:DMTTonx5m65Ic0GOoRY2c16WCbHxOOw6xxezuLaBpcU=",
+      "Version": "v1.10.2"
+    },
+    {
+      "GoModSum": "h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=",
+      "Path": "github.com/stretchr/testify",
+      "Sum": "h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=",
+      "Version": "v1.11.1"
+    },
+    {
+      "GoModSum": "h1:qTvIHMFKoxW7HXg02gm6/Wofhq5p3Ib/A/NNt1EoBSQ=",
+      "Path": "go.opentelemetry.io/contrib/exporters/autoexport",
+      "Sum": "h1:4fnRcNpc6YFtG3zsFw9achKn3XgmxPxuMuqIL5rE8e8=",
+      "Version": "v0.67.0"
+    },
+    {
+      "GoModSum": "h1:C2NGBr+kAB4bk3xtMXfZ94gqFDtg/GkI7e9zqGh5Beg=",
+      "Path": "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp",
+      "Sum": "h1:OyrsyzuttWTSur2qN/Lm0m2a8yqyIjUVBZcxFPuXq2o=",
+      "Version": "v0.67.0"
+    },
+    {
+      "GoModSum": "h1:BMgjTHL9WPRlRjL2oZCBTL4whCGtXch2H4BhOPIAyYc=",
+      "Path": "go.opentelemetry.io/otel",
+      "Sum": "h1:JjwHmHpA4iZ3wBxluu2fbbE7j4kqlE8jXyAyPXH7HqU=",
+      "Version": "v1.44.0"
+    },
+    {
+      "GoModSum": "h1:UI3wi0FXg1Pofb8ZBiBLhtMzgoTm1TYkMvn71fAqDzs=",
+      "Path": "go.opentelemetry.io/otel/exporters/stdout/stdouttrace",
+      "Sum": "h1:s/1iRkCKDfhlh1JF26knRneorus8aOwVIDhvYx9WoDw=",
+      "Version": "v1.42.0"
+    },
+    {
+      "GoModSum": "h1:P+IkVU3iWukmiit/Yf9AWvpyRDlUeBaRg6Y+C58QHzg=",
+      "Path": "go.opentelemetry.io/otel/sdk",
+      "Sum": "h1:pi5mE86i5rTeLXqoF/hhiBtUNcrAGHLKQdhg4h4V9Dg=",
+      "Version": "v1.43.0"
+    },
+    {
+      "GoModSum": "h1:oLl1jrMQAVo6v3GAggN+1VH9VIz9iUSvW53sW1Q8PIE=",
+      "Path": "go.opentelemetry.io/otel/trace",
+      "Sum": "h1:jxF5CsGYCe74MCRx2X4g7WsY/VBKRqqpNvXlX/6gtIk=",
+      "Version": "v1.44.0"
+    },
+    {
+      "GoModSum": "h1:ErX4dUh2UM+CFYiXZRTcMpEcN8b/1gxEuv3nODoYtCA=",
+      "Path": "golang.org/x/crypto",
+      "Sum": "h1:+Ng2ULVvLHnJ/ZFEq4KdcDd/cfjrrjjNSXNzxg0Y4U4=",
+      "Version": "v0.49.0"
+    },
+    {
+      "GoModSum": "h1:R1MAz7uMZxVMualyPXb+VaqGSa3LIaUqk0eEt3w36Sw=",
+      "Path": "golang.org/x/net",
+      "Sum": "h1:He/TN1l0e4mmR3QqHMT2Xab3Aj3L9qjbhRm78/6jrW0=",
+      "Version": "v0.52.0"
+    },
+    {
+      "GoModSum": "h1:lzm5WQJQwKZ3nwavOZ3IS5Aulzxi68dUSgRHujetwEA=",
+      "Path": "golang.org/x/oauth2",
+      "Sum": "h1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=",
+      "Version": "v0.35.0"
+    },
+    {
+      "GoModSum": "h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=",
+      "Path": "golang.org/x/sync",
+      "Sum": "h1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=",
+      "Version": "v0.20.0"
+    },
+    {
+      "GoModSum": "h1:bYPpLG8AyeMWwDU6NXoB00xC0DFkikVvd5MfwoxjLqE=",
+      "Path": "google.golang.org/api",
+      "Sum": "h1:h2Gkq07OYi6kusGOaT/9rnNljuXmqPnaig7WGPmKbwA=",
+      "Version": "v0.214.0"
+    },
+    {
+      "GoModSum": "h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=",
+      "Path": "gopkg.in/yaml.v2",
+      "Sum": "h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=",
+      "Version": "v2.4.0"
+    },
+    {
+      "GoModSum": "h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=",
+      "Path": "cel.dev/expr",
+      "Sum": "h1:1KrZg61W6TWSxuNZ37Xy49ps13NUovb66QLprthtwi4=",
+      "Version": "v0.25.1"
+    },
+    {
+      "GoModSum": "h1:cEPSRWPzZEswwdr9BxE6ChEn01dWlTaF05LiC2Xs70U=",
+      "Path": "cloud.google.com/go",
+      "Sum": "h1:B3fRrSDkLRt5qSHWe40ERJvhvnQwdZiHu0bJOpldweE=",
+      "Version": "v0.116.0"
+    },
+    {
+      "GoModSum": "h1:COOjD9gwfKNKz+IIduatIhYJQIc0mG3H102r/EMxX6Q=",
+      "Path": "cloud.google.com/go/auth",
+      "Sum": "h1:8Fu8TZy167JkW8Tj3q7dIkr2v4cndv41ouecJx0PAHs=",
+      "Version": "v0.13.0"
+    },
+    {
+      "GoModSum": "h1:AlmsELtlEBnaNTL7jCj8VQFLy6mbZv0s4Q7NGBeQ5E8=",
+      "Path": "cloud.google.com/go/auth/oauth2adapt",
+      "Sum": "h1:V6a6XDu2lTwPZWOawrAa9HUK+DB2zfJyTuciBG5hFkU=",
+      "Version": "v0.2.6"
+    },
+    {
+      "GoModSum": "h1:E0bWwX5wTnLPedCKqk3pJmVgCBSM6qQI1yTBdEb3C10=",
+      "Path": "cloud.google.com/go/compute/metadata",
+      "Sum": "h1:pDUj4QMoPejqq20dK0Pg2N4yG9zIkYGdBtwLoEkH9Zs=",
+      "Version": "v0.9.0"
+    },
+    {
+      "GoModSum": "h1:0Ys8ccaZHdI1dEUilwzqng/6ps2YB6vRsjIe00/+6JY=",
+      "Path": "cloud.google.com/go/iam",
+      "Sum": "h1:ozUSofHUGf/F4tCNy/mu9tHLTaxZFLOUiKzjcgWHGIA=",
+      "Version": "v1.2.2"
+    },
+    {
+      "GoModSum": "h1:hS3pXvaG8KgWTSz+dAdyzPrGUYmi2Q+WFX8g2hqVEZU=",
+      "Path": "cloud.google.com/go/monitoring",
+      "Sum": "h1:FChwVtClH19E7pJ+e0xUhJPGksctZNVOk2UhMmblmdU=",
+      "Version": "v1.21.2"
+    },
+    {
+      "GoModSum": "h1:iZDifYGJTIgIIkYRNWPENUnqx6bJ2xnSDFI2tjwZNuY=",
+      "Path": "github.com/Azure/azure-sdk-for-go/sdk/internal",
+      "Sum": "h1:ywEEhmNahHBihViHepv3xPBn1663uRv2t2q/ESv9seY=",
+      "Version": "v1.10.0"
+    },
+    {
+      "GoModSum": "h1:wP83P5OoQ5p6ip3ScPr0BAq0BvuPAvacpEuSzyouqAI=",
+      "Path": "github.com/AzureAD/microsoft-authentication-library-for-go",
+      "Sum": "h1:H5xDQaE3XowWfhZRUpnfC+rGZMEVoSiji+b+/HFAPU4=",
+      "Version": "v1.3.3"
+    },
+    {
+      "GoModSum": "h1:P4WPRUkOhJC13W//jWpyfJNDAIpvRbAUIYLX/4jtlE0=",
+      "Path": "github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp",
+      "Sum": "h1:DHa2U07rk8syqvCge0QIGMCE1WxGj9njT44GH7zNJLQ=",
+      "Version": "v1.31.0"
+    },
+    {
+      "GoModSum": "h1:jyqM3eLpJ3IbIFDTKVz2rF9T/xWGW0rIriGwnz8l9Tk=",
+      "Path": "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric",
+      "Sum": "h1:UQ0AhxogsIRZDkElkblfnwjc3IaltCm2HUMvezQaL7s=",
+      "Version": "v0.48.1"
+    },
+    {
+      "GoModSum": "h1:viRWSEhtMZqz1rhwmOVKkWl6SwmVowfL9O2YR5gI2PE=",
+      "Path": "github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping",
+      "Sum": "h1:8nn+rsCvTq9axyEh382S0PFLBeaFwNsT43IrPWzctRU=",
+      "Version": "v0.48.1"
+    },
+    {
+      "GoModSum": "h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=",
+      "Path": "github.com/beorn7/perks",
+      "Sum": "h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=",
+      "Version": "v1.0.1"
+    },
+    {
+      "GoModSum": "h1:rkhZdG3JZukswDf7f0cwqPNk4K0sa+F97BxZthm/crw=",
+      "Path": "github.com/cenkalti/backoff/v5",
+      "Sum": "h1:ZN+IMa753KfX5hd8vVaMixjnqRZ3y8CuJKRKj1xcsSM=",
+      "Version": "v5.0.3"
+    },
+    {
+      "GoModSum": "h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=",
+      "Path": "github.com/cespare/xxhash/v2",
+      "Sum": "h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=",
+      "Version": "v2.3.0"
+    },
+    {
+      "GoModSum": "h1:KdCmV+x/BuvyMxRnYBlmVaq4OLiKW6iRQfvC62cvdkI=",
+      "Path": "github.com/cncf/xds/go",
+      "Sum": "h1:6xNmx7iTtyBRev0+D/Tv1FZd4SCg8axKApyNyRsAt/w=",
+      "Version": "v0.0.0-20251210132809-ee656c7534f5"
+    },
+    {
+      "GoModSum": "h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=",
+      "Path": "github.com/cyphar/filepath-securejoin",
+      "Sum": "h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=",
+      "Version": "v0.2.4"
+    },
+    {
+      "GoModSum": "h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=",
+      "Path": "github.com/davecgh/go-spew",
+      "Sum": "h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=",
+      "Version": "v1.1.2-0.20180830191138-d8f796af33cc"
+    },
+    {
+      "GoModSum": "h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=",
+      "Path": "github.com/dgryski/go-rendezvous",
+      "Sum": "h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=",
+      "Version": "v0.0.0-20200823014737-9f7001d12a5f"
+    },
+    {
+      "GoModSum": "h1:ty89S1YCCVruQAm9OtKeEkQLTb+Lkz0k8v9W0Oxsv98=",
+      "Path": "github.com/envoyproxy/go-control-plane/envoy",
+      "Sum": "h1:yg/JjO5E7ubRyKX3m07GF3reDNEnfOboJ0QySbH736g=",
+      "Version": "v1.36.0"
+    },
+    {
+      "GoModSum": "h1:HvYl7zwPa5mffgyeTUHA9zHIH36nmrm7oCbo4YKoSWA=",
+      "Path": "github.com/envoyproxy/protoc-gen-validate",
+      "Sum": "h1:TvGH1wof4H33rezVKWSpqKz5NXWg5VPuZ0uONDT6eb4=",
+      "Version": "v1.3.0"
+    },
+    {
+      "GoModSum": "h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=",
+      "Path": "github.com/felixge/httpsnoop",
+      "Sum": "h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=",
+      "Version": "v1.0.4"
+    },
+    {
+      "GoModSum": "h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=",
+      "Path": "github.com/go-logr/logr",
+      "Sum": "h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=",
+      "Version": "v1.4.3"
+    },
+    {
+      "GoModSum": "h1:mMo/vtBO5dYbehREoey6XUKy/eSumjCCveDpRre4VKE=",
+      "Path": "github.com/go-logr/stdr",
+      "Sum": "h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=",
+      "Version": "v1.2.2"
+    },
+    {
+      "GoModSum": "h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=",
+      "Path": "github.com/golang-jwt/jwt/v5",
+      "Sum": "h1:pv4AsKCKKZuqlgs5sUmn4x8UlGa0kEVt/puTpKx9vvo=",
+      "Version": "v5.3.0"
+    },
+    {
+      "GoModSum": "h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=",
+      "Path": "github.com/golang/groupcache",
+      "Sum": "h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=",
+      "Version": "v0.0.0-20210331224755-41bb18bfe9da"
+    },
+    {
+      "GoModSum": "h1:6iNWHTpQ+nfNRN5E00MSdfDwVesa8hhS32PhPO8deJA=",
+      "Path": "github.com/google/s2a-go",
+      "Sum": "h1:zZDs9gcbt9ZPLV0ndSyQk6Kacx2g/X+SKYovpnz3SMM=",
+      "Version": "v0.1.8"
+    },
+    {
+      "GoModSum": "h1:YKe7cfqYXjKGpGvmSg28/fFvhNzinZQm8DGnaburhGA=",
+      "Path": "github.com/googleapis/enterprise-certificate-proxy",
+      "Sum": "h1:XYIDZApgAnrN1c855gTgghdIA6Stxb52D5RnLI1SLyw=",
+      "Version": "v0.3.4"
+    },
+    {
+      "GoModSum": "h1:lhBCnjdLrWRaPvLWhmc8IS24m9mr07qSYnHncrgo+zk=",
+      "Path": "github.com/googleapis/gax-go/v2",
+      "Sum": "h1:f+jMrjBPl+DL9nI4IQzLUxMq7XrAqFYB7hBPqMNIe8o=",
+      "Version": "v2.14.0"
+    },
+    {
+      "GoModSum": "h1:JfhWUomR1baixubs02l85lZYYOm7LV6om4ceouMv45c=",
+      "Path": "github.com/grpc-ecosystem/grpc-gateway/v2",
+      "Sum": "h1:HWRh5R2+9EifMyIHV7ZV+MIZqgz+PMpZ14Jynv3O2Zs=",
+      "Version": "v2.28.0"
+    },
+    {
+      "GoModSum": "h1:QeFd9opnmA6QUJc5vARoKUSoFhyfM2/ZepoAG6RGpeM=",
+      "Path": "github.com/hashicorp/golang-lru/v2",
+      "Sum": "h1:wW7h1TG88eUIJ2i69gaE3uNVtEPIagzhGvHgwfx2Vm4=",
+      "Version": "v2.0.5"
+    },
+    {
+      "GoModSum": "h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=",
+      "Path": "github.com/inconshreveable/mousetrap",
+      "Sum": "h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=",
+      "Version": "v1.1.0"
+    },
+    {
+      "GoModSum": "h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=",
+      "Path": "github.com/jmespath/go-jmespath",
+      "Sum": "h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=",
+      "Version": "v0.4.0"
+    },
+    {
+      "GoModSum": "h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=",
+      "Path": "github.com/kylelemons/godebug",
+      "Sum": "h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=",
+      "Version": "v1.1.0"
+    },
+    {
+      "GoModSum": "h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=",
+      "Path": "github.com/munnerz/goautoneg",
+      "Sum": "h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=",
+      "Version": "v0.0.0-20191010083416-a7dc8b61c822"
+    },
+    {
+      "GoModSum": "h1:7rwL4CYBLnjLxUqIJNnCWiEdr3bn6IUYi15bNlnbCCU=",
+      "Path": "github.com/pkg/browser",
+      "Sum": "h1:+mdjkGKdHQG3305AYmdv1U2eRNDiU2ErMBj1gwrq8eQ=",
+      "Version": "v0.0.0-20240102092130-5ac0b6a4141c"
+    },
+    {
+      "GoModSum": "h1:t/avpk3KcrXxUnYOhZhMXJlSEyie6gQbtLq5NM3loB8=",
+      "Path": "github.com/planetscale/vtprotobuf",
+      "Sum": "h1:GFCKgmp0tecUJ0sJuv4pzYCqS9+RGSn52M3FUwPs+uo=",
+      "Version": "v0.6.1-0.20240319094008-0393e58bdf10"
+    },
+    {
+      "GoModSum": "h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=",
+      "Path": "github.com/pmezard/go-difflib",
+      "Sum": "h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=",
+      "Version": "v1.0.1-0.20181226105442-5d4384ee4fb2"
+    },
+    {
+      "GoModSum": "h1:Tb1a6LWHB3/SPIzCoaDXI4I8UHKeFTEQ1YCr+0Gyqmg=",
+      "Path": "github.com/prometheus/client_golang",
+      "Sum": "h1:Je96obch5RDVy3FDMndoUsjAhG5Edi49h0RJWRi/o0o=",
+      "Version": "v1.23.2"
+    },
+    {
+      "GoModSum": "h1:y3m2F6Gdpfy6Ut/GBsUqTWZqCUvMVzSfMLjcu6wAwpE=",
+      "Path": "github.com/prometheus/client_model",
+      "Sum": "h1:oBsgwpGs7iVziMvrGhE53c/GrLUsZdHnqNwqPLxwZyk=",
+      "Version": "v0.6.2"
+    },
+    {
+      "GoModSum": "h1:SjE/0MzDEEAyrdr5Gqc6G+sXI67maCxzaT3A2+HqjUw=",
+      "Path": "github.com/prometheus/common",
+      "Sum": "h1:pIgK94WWlQt1WLwAC5j2ynLaBRDiinoAb86HZHTUGI4=",
+      "Version": "v0.67.5"
+    },
+    {
+      "GoModSum": "h1:vRYWnXvI6aWGpsdY/mOT/cbeVRBlPWtBNDb7kGR3uKM=",
+      "Path": "github.com/prometheus/otlptranslator",
+      "Sum": "h1:s0LJW/iN9dkIH+EnhiD3BlkkP5QVIUVEoIwkU+A6qos=",
+      "Version": "v1.0.0"
+    },
+    {
+      "GoModSum": "h1:o9EMBZGRyvDrSPH1RqdxhojkuXstoe4UlK79eF5TGGo=",
+      "Path": "github.com/prometheus/procfs",
+      "Sum": "h1:XwbrGOIplXW/AU3YhIhLODXMJYyC1isLFfYCsTEycfc=",
+      "Version": "v0.20.1"
+    },
+    {
+      "GoModSum": "h1:fyalQWdtzDBECAQFBJuQe5bzQ02jGd5Qcbgb97Flm7U=",
+      "Path": "github.com/redis/go-redis/extra/rediscmd/v9",
+      "Sum": "h1:EaDatTxkdHG+U3Bk4EUr+DZ7fOGwTfezUiUJMaIcaho=",
+      "Version": "v9.0.5"
+    },
+    {
+      "GoModSum": "h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=",
+      "Path": "github.com/spf13/pflag",
+      "Sum": "h1:4EBh2KAYBwaONj6b2Ye1GiHfwjqyROoF4RwYO+vPwFk=",
+      "Version": "v1.0.10"
+    },
+    {
+      "GoModSum": "h1:gm2SeUoMZEtpnzPNs2Csc0D/gX33k1xIx7lEzqblHEs=",
+      "Path": "github.com/spiffe/go-spiffe/v2",
+      "Sum": "h1:l+DolpxNWYgruGQVV0xsfeya3CsC7m8iBzDnMpsbLuo=",
+      "Version": "v2.6.0"
+    },
+    {
+      "GoModSum": "h1:GBR0iDaNXjAgGg9zfCvksxSRnQx76gclCIb7kdAd1Pw=",
+      "Path": "github.com/yuin/gopher-lua",
+      "Sum": "h1:kYKnWBjvbNP4XLT3+bPEwAXJx262OhaHDWDVOPjL46M=",
+      "Version": "v1.1.1"
+    },
+    {
+      "GoModSum": "h1:vNK8G9p7aAivkbmorf4v+7Hgx+Zs0yY+0fOtgBfjQKo=",
+      "Path": "go.opencensus.io",
+      "Sum": "h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=",
+      "Version": "v0.24.0"
+    },
+    {
+      "GoModSum": "h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=",
+      "Path": "go.opentelemetry.io/auto/sdk",
+      "Sum": "h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=",
+      "Version": "v1.2.1"
+    },
+    {
+      "GoModSum": "h1:Z5RIwRkZgauOIfnG5IpidvLpERjhTninpP1dTG2jTl4=",
+      "Path": "go.opentelemetry.io/contrib/bridges/prometheus",
+      "Sum": "h1:dkBzNEAIKADEaFnuESzcXvpd09vxvDZsOjx11gjUqLk=",
+      "Version": "v0.67.0"
+    },
+    {
+      "GoModSum": "h1:t/OGqzHBa5v6RHZwrDBJ2OirWc+4q/w2fTbLZwAKjTk=",
+      "Path": "go.opentelemetry.io/contrib/detectors/gcp",
+      "Sum": "h1:kWRNZMsfBHZ+uHjiH4y7Etn2FK26LAGkNFw7RHv1DhE=",
+      "Version": "v1.39.0"
+    },
+    {
+      "GoModSum": "h1:B9yO6b04uB80CzjedvewuqDhxJxi11s7/GtiGa8bAjI=",
+      "Path": "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
+      "Sum": "h1:r6I7RJCN86bpD/FQwedZ0vSixDpwuWREjW9oRMsmqDc=",
+      "Version": "v0.54.0"
+    },
+    {
+      "GoModSum": "h1:PFx9NgpNUKXdf7J4Q3agRxMs3Y07QhTCVipKmLsMKnU=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc",
+      "Sum": "h1:deI9UQMoGFgrg5iLPgzueqFPHevDl+28YKfSpPTI6rY=",
+      "Version": "v0.18.0"
+    },
+    {
+      "GoModSum": "h1:ji9vId85hMxqfvICA0Jt8JqEdrXaAkcpkI9HPXya0ro=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp",
+      "Sum": "h1:HIBTQ3VO5aupLKjC90JgMqpezVXwFuq6Ryjn0/izoag=",
+      "Version": "v0.19.0"
+    },
+    {
+      "GoModSum": "h1:RolT8tWtfHcjajEH5wFIZ4Dgh5jpPdFXYV9pTAk/qjc=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc",
+      "Sum": "h1:MdKucPl/HbzckWWEisiNqMPhRrAOQX8r4jTuGr636gk=",
+      "Version": "v1.42.0"
+    },
+    {
+      "GoModSum": "h1:HBy4BjzgVE8139ieRI75oXm3EcDN+6GhD88JT1Kjvxg=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp",
+      "Sum": "h1:w1K+pCJoPpQifuVpsKamUdn9U0zM3xUziVOqsGksUrY=",
+      "Version": "v1.43.0"
+    },
+    {
+      "GoModSum": "h1:Vl1/iaggsuRlrHf/hfPJPvVag77kKyvrLeD10kpMl+A=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlptrace",
+      "Sum": "h1:88Y4s2C8oTui1LGM6bTWkw0ICGcOLCAI5l6zsD1j20k=",
+      "Version": "v1.43.0"
+    },
+    {
+      "GoModSum": "h1:2qXPNBX1OVRC0IwOnfo1ljoid+RD0QK3443EaqVlsOU=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc",
+      "Sum": "h1:zWWrB1U6nqhS/k6zYB74CjRpuiitRtLLi68VcgmOEto=",
+      "Version": "v1.42.0"
+    },
+    {
+      "GoModSum": "h1:/G+nUPfhq2e+qiXMGxMwumDrP5jtzU+mWN7/sjT2rak=",
+      "Path": "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp",
+      "Sum": "h1:3iZJKlCZufyRzPzlQhUIWVmfltrXuGyfjREgGP3UUjc=",
+      "Version": "v1.43.0"
+    },
+    {
+      "GoModSum": "h1:UrgcjnarfdlBDP3GjDIJWe6HTprwSazNjwsI+Ru6hro=",
+      "Path": "go.opentelemetry.io/otel/exporters/prometheus",
+      "Sum": "h1:g0LRDXMX/G1SEZtK8zl8Chm4K6GBwRkjPKE36LxiTYs=",
+      "Version": "v0.64.0"
+    },
+    {
+      "GoModSum": "h1:K3kRa2ckmHWQaTWQdPRHc7qGXASuVuoEQXzrvlA98Ws=",
+      "Path": "go.opentelemetry.io/otel/exporters/stdout/stdoutlog",
+      "Sum": "h1:KJVjPD3rcPb98rIs3HznyJlrfx9ge5oJvxxlGR+P/7s=",
+      "Version": "v0.18.0"
+    },
+    {
+      "GoModSum": "h1:so9ounLcuoRDu033MW/E0AD4hhUjVqswrMF5FoZlBcw=",
+      "Path": "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric",
+      "Sum": "h1:lSZHgNHfbmQTPfuTmWVkEu8J8qXaQwuV30pjCcAUvP8=",
+      "Version": "v1.42.0"
+    },
+    {
+      "GoModSum": "h1:5DQYeGmxVIr4n0/BcJvF4upsraHjg6vudJJpnkL6Ipk=",
+      "Path": "go.opentelemetry.io/otel/log",
+      "Sum": "h1:KUZs/GOsw79TBBMfDWsXS+KZ4g2Ckzksd1ymzsIEbo4=",
+      "Version": "v0.19.0"
+    },
+    {
+      "GoModSum": "h1:8O7hanEPBNgEMmybD3s2VBKcgWOCsA6tzHBPODAiquo=",
+      "Path": "go.opentelemetry.io/otel/metric",
+      "Sum": "h1:1w0gILTcHdr3YI+ixLyjemwrVnsMURbTZFrSYCdDdmc=",
+      "Version": "v1.44.0"
+    },
+    {
+      "GoModSum": "h1:vFBowwXGLlW9AvpuF7bMgnNI95LiW10szrOdvzBHlAg=",
+      "Path": "go.opentelemetry.io/otel/sdk/log",
+      "Sum": "h1:scYVLqT22D2gqXItnWiocLUKGH9yvkkeql5dBDiXyko=",
+      "Version": "v0.19.0"
+    },
+    {
+      "GoModSum": "h1:C/RJtwSEJ5hzTiUz5pXF1kILHStzb9zFlIEe85bhj6A=",
+      "Path": "go.opentelemetry.io/otel/sdk/metric",
+      "Sum": "h1:S88dyqXjJkuBNLeMcVPRFXpRw2fuwdvfCGLEo89fDkw=",
+      "Version": "v1.43.0"
+    },
+    {
+      "GoModSum": "h1:/CV4QoCR/S9yaPj8utp3lvQPoqMtxXdzn7ozvvozVqk=",
+      "Path": "go.opentelemetry.io/proto/otlp",
+      "Sum": "h1:IQRWgT5srOCYfiWnpqUYz9CVmbO8bFmKcwYxpuCSL2g=",
+      "Version": "v1.10.0"
+    },
+    {
+      "GoModSum": "h1:zSxWcmIDjOzPXpjlTTbAsKokqkDNAVtZO0WOMiT90s8=",
+      "Path": "go.yaml.in/yaml/v2",
+      "Sum": "h1:6gvOSjQoTB3vt1l+CU+tSyi/HOjfOjRLJ4YwYZGwRO0=",
+      "Version": "v2.4.3"
+    },
+    {
+      "GoModSum": "h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=",
+      "Path": "golang.org/x/sys",
+      "Sum": "h1:omrd2nAlyT5ESRdCLYdm3+fMfNFE/+Rf4bDIQImRJeo=",
+      "Version": "v0.42.0"
+    },
+    {
+      "GoModSum": "h1:khi/HExzZJ2pGnjenulevKNX1W67CUy0AsXcNubPGCA=",
+      "Path": "golang.org/x/text",
+      "Sum": "h1:JOVx6vVDFokkpaq1AEptVzLTpDe9KGpj5tR4/X+ybL8=",
+      "Version": "v0.35.0"
+    },
+    {
+      "GoModSum": "h1:eL/Oa2bBBK0TkX57Fyni+NgnyQQN4LitPmob2Hjnqw4=",
+      "Path": "golang.org/x/time",
+      "Sum": "h1:MRx4UaLrDotUKUdCIqzPC48t1Y9hANFKIRpNx+Te8PI=",
+      "Version": "v0.14.0"
+    },
+    {
+      "GoModSum": "h1:JJrvXBWRZaFMxBufik1a4RpFw4HhgVtBBWQeQgUj2cc=",
+      "Path": "google.golang.org/genproto",
+      "Sum": "h1:ToEetK57OidYuqD4Q5w+vfEnPvPpuTwedCNVohYJfNk=",
+      "Version": "v0.0.0-20241118233622-e639e219e697"
+    },
+    {
+      "GoModSum": "h1:7QBABkRtR8z+TEnmXTqIqwJLlzrZKVfAUm7tY3yGv0M=",
+      "Path": "google.golang.org/genproto/googleapis/api",
+      "Sum": "h1:VPWxll4HlMw1Vs/qXtN7BvhZqsS9cdAittCNvVENElA=",
+      "Version": "v0.0.0-20260401024825-9d38bb4040a9"
+    },
+    {
+      "GoModSum": "h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=",
+      "Path": "google.golang.org/genproto/googleapis/rpc",
+      "Sum": "h1:m8qni9SQFH0tJc1X0vmnpw/0t+AImlSvp30sEupozUg=",
+      "Version": "v0.0.0-20260401024825-9d38bb4040a9"
+    },
+    {
+      "GoModSum": "h1:ho/dLnxwi3EDJA4Zghp7k2Ec1+c2jqup0bFkw07bwF4=",
+      "Path": "google.golang.org/grpc",
+      "Sum": "h1:Xr6m2WmWZLETvUNvIUmeD5OAagMw3FiKmMlTdViWsHM=",
+      "Version": "v1.80.0"
+    },
+    {
+      "GoModSum": "h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=",
+      "Path": "google.golang.org/protobuf",
+      "Sum": "h1:fV6ZwhNocDyBLK0dj+fg8ektcVegBBuEolpbTQyBNVE=",
+      "Version": "v1.36.11"
+    },
+    {
+      "GoModSum": "h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=",
+      "Path": "gopkg.in/yaml.v3",
+      "Sum": "h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=",
+      "Version": "v3.0.1"
+    }
+  ],
+  "baggage_source_sha256": "2ff9a09d95f72d1d389e5fedc03ac1f30c0fb4fbbae2194ea9edb5af76ff7e36"
+}

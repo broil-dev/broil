@@ -4,6 +4,9 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Topic {
     General,
+    Secrets(&'static str),
+    Image(&'static str),
+    K3s(&'static str),
     Run,
     Env,
     Get,
@@ -29,6 +32,9 @@ impl Topic {
             "env" => Some(Self::Env),
             "get" => Some(Self::Get),
             "remote" => Some(Self::Remote),
+            "secrets" => Some(Self::Secrets("")),
+            "image" => Some(Self::Image("")),
+            "k3s" => Some(Self::K3s("")),
             "help" => Some(Self::Help),
             "version" => Some(Self::Version),
             _ => None,
@@ -54,7 +60,10 @@ impl Topic {
 
 pub fn render(topic: Topic) -> &'static [u8] {
     match topic {
-        Topic::General => b"Usage: broil [--file <path>] [command] [args...]\n\nCommands:\n  env <name> [command...]   Enter an environment or run a command\n  get <selector>            Inspect resolved project state\n  help [command]            Show help for Broil or a built-in command\n  remote <command>          Manage remote machines\n  run <script> [args...]    Run a configured script\n  version                   Show the Broil version\n\nOptions:\n  --file <path>             Use a specific Broil config file\n  --help                    Show help\n  --version                 Show the Broil version\n",
+        Topic::Secrets(path) => crate::secrets::help(path),
+        Topic::Image(path) => crate::images::commands::help(path),
+        Topic::K3s(path) => crate::k3s::commands::help(path),
+        Topic::General => b"Usage: broil [--file <path>] [command] [args...]\n\nCommands:\n  env <name> [command...]   Enter an environment or run a command\n  get <selector>            Inspect resolved project state\n  help [command]            Show help for Broil or a built-in command\n  image <command>           Build, publish and inspect project images\n  k3s <command>             Manage K3s infrastructure and its registry\n  remote <command>          Manage remote machines\n  run <script> [args...]    Run a configured script\n  secrets <command>         Manage encrypted secrets and optional vault access\n  version                   Show the Broil version\n\nOptions:\n  --file <path>             Use a specific Broil config file\n  --help                    Show help\n  --version                 Show the Broil version\n",
         Topic::Run => {
             b"Usage: broil run <script> [args...]\n\nRun a configured script.\n"
         }

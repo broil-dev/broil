@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "0.24.0",
+  "source_commit": "b772c318368090fb2ffc9c0fed92e0a35bf82389",
+  "controller": "linux/amd64",
+  "url": "https://github.com/moby/buildkit/releases/download/v0.24.0/buildkit-v0.24.0.linux-amd64.tar.gz",
+  "archive_size": 87319229,
+  "archive_sha256": "af8064eca16077b4d6937745988ba2d2dfa439540874cdcd918318315f3ba1d3",
+  "archive_limit": 268435456,
+  "selected_expanded_limit": 536870912,
+  "members": {
+    "bin/buildkit-qemu-aarch64": {
+      "size": 11337400,
+      "sha256": "cbf6308eb61214bd5df71520b8801fa19a9f0c810fb2a5adb084483da3aa8911"
+    },
+    "bin/buildkit-runc": {
+      "size": 17272544,
+      "sha256": "93fd94638b47008278ac31cf81c0a60b2d995acd3e42685478f16e66f4ddb0d3"
+    },
+    "bin/buildkitd": {
+      "size": 66476450,
+      "sha256": "b154375ba70ec98fdfc7c08c9576226c88f3802638900ff5742de0b1668c9fcb"
+    }
+  },
+  "archive_inventory": [
+    {
+      "name": "bin",
+      "size": 0,
+      "type": "directory"
+    },
+    {
+      "name": "bin/buildctl",
+      "size": 33536339,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-cni-bridge",
+      "size": 5694447,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-cni-firewall",
+      "size": 5749447,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-cni-host-local",
+      "size": 4364143,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-cni-loopback",
+      "size": 4263979,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-aarch64",
+      "size": 11337400,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-arm",
+      "size": 8735712,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-i386",
+      "size": 7795840,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-ppc64le",
+      "size": 8313240,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-riscv64",
+      "size": 8790672,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-qemu-s390x",
+      "size": 7506416,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkit-runc",
+      "size": 17272544,
+      "type": "file"
+    },
+    {
+      "name": "bin/buildkitd",
+      "size": 66476450,
+      "type": "file"
+    }
+  ]
+}

@@ -61,7 +61,9 @@ pub fn child_env(
 ) -> BTreeMap<OsString, OsString> {
     let mut env: BTreeMap<OsString, OsString> = base
         .iter()
-        .filter(|(name, _)| !is_reserved(name))
+        .filter(|(name, _)| {
+            !is_reserved(name) && !broil_core::secret::environment::is_credential_input(name)
+        })
         .cloned()
         .collect();
     for (name, value) in &resolved.env_vars {

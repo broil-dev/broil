@@ -1,3 +1,4 @@
+// Modified by the Broil project from russh 0.62.5; see LICENSE.txt and docs/provenance/russh-0.62.5.md for provenance.
 // Copyright 2016 Pierre-Étienne Meunier
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -349,11 +350,16 @@ impl PacketBytesWriter {
 }
 
 /// Incoming SSH packet after decryption and optional decompression.
-/// Uses Vec<u8> (not CryptoVec/mlocked) because incoming network data is not secret.
-#[derive(Debug)]
+/// Private client packets retain their zeroizing owner through Bytes.
 pub(crate) struct IncomingSshPacket {
-    pub buffer: Vec<u8>,
+    pub buffer: bytes::Bytes,
     pub seqn: Wrapping<u32>,
+}
+
+impl Debug for IncomingSshPacket {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("IncomingSshPacket").field("len", &self.buffer.len()).field("seqn", &self.seqn).finish()
+    }
 }
 
 /// Packet writer for constructing and encrypting outgoing SSH packets.

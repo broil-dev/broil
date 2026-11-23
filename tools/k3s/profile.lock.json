@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "status": "unadopted-feasibility-candidate",
+  "platform": "linux/amd64",
+  "host": "Ubuntu 24.04/systemd",
+  "normal_install_versions": [
+    "v1.36.4+k3s1"
+  ],
+  "k3s": {
+    "version": "v1.36.4+k3s1",
+    "source_revision": "4dedb15be78017a8ddd5b9e81acd44f3481078ed",
+    "assets": {
+      "k3s": {
+        "url": "https://github.com/k3s-io/k3s/releases/download/v1.36.4%2Bk3s1/k3s",
+        "size": 78991522,
+        "sha256": "835873f37245fc615f547a2fe2af9402a347875f13fa64a1f136de644955ea3f"
+      },
+      "k3s-airgap-images-amd64.tar.gz": {
+        "url": "https://github.com/k3s-io/k3s/releases/download/v1.36.4%2Bk3s1/k3s-airgap-images-amd64.tar.gz",
+        "size": 193296259,
+        "sha256": "a5a6c970a992ce6ed5801b5fd090aa7edde354a786eb0e7d75b162d0b22901dd"
+      }
+    }
+  },
+  "runtime_source": {
+    "revision": "4dedb15be78017a8ddd5b9e81acd44f3481078ed",
+    "files": [
+      {
+        "path": "LICENSE",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/LICENSE",
+        "size": 10174,
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "go.mod",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/go.mod",
+        "size": 29840,
+        "sha256": "e46938bc44e8e21492d9f4c36b257e2207444f7e61ae629623d05119365439a7"
+      },
+      {
+        "path": "pkg/etcd/etcd.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/etcd/etcd.go",
+        "size": 54782,
+        "sha256": "06f8b42cf03cede6551352f5171063bf7becf9b00e2fdddd56f1453f0bde969b"
+      },
+      {
+        "path": "pkg/agent/containerd/config.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/agent/containerd/config.go",
+        "size": 9936,
+        "sha256": "443ce92a63a4c13451ef6312dc29bf12fac457fab730b820cf4f58f96ab988d1"
+      },
+      {
+        "path": "pkg/agent/containerd/containerd.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/agent/containerd/containerd.go",
+        "size": 18264,
+        "sha256": "7f4058e7bc39e42194ad5f4eca6ab232855425eb48c47073bcb80ac60b7f91db"
+      },
+      {
+        "path": "pkg/agent/config/config.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/agent/config/config.go",
+        "size": 32717,
+        "sha256": "c4437f35227ac30f7fb9d95636f382bf95f67ebe006d37bb916d9394eb92fc74"
+      },
+      {
+        "path": "pkg/server/server.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/server/server.go",
+        "size": 19699,
+        "sha256": "d30f39bbcf84f7d243278e663aebda50d87d2183952802ee03e7818ea5b00048"
+      },
+      {
+        "path": "pkg/deploy/controller.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/deploy/controller.go",
+        "size": 17346,
+        "sha256": "2cb8c933ca3f1c23b6ab5c154f6acf38c22f1a5f7a9802e9e99bc81ccddc51ce"
+      },
+      {
+        "path": "pkg/daemons/executor/executor.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/daemons/executor/executor.go",
+        "size": 8916,
+        "sha256": "b086ebf92a5c7cff4540dd8985180368a3c17b63b4ecef68ed1880c46c5a7f6b"
+      },
+      {
+        "path": "pkg/executor/embed/embed.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/executor/embed/embed.go",
+        "size": 14042,
+        "sha256": "d8318ae9e971da1c2deedb0c53b4f3b76f011ce26abf11e0fcae0462050ef6c4"
+      },
+      {
+        "path": "pkg/executor/embed/etcd/etcd.go",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/pkg/executor/embed/etcd/etcd.go",
+        "size": 1848,
+        "sha256": "9e59df203403b6a8db76b73f67d64c3462ebe4ee1ac0a5ce1b2a852f5d4a38ee"
+      },
+      {
+        "path": "manifests/metrics-server/metrics-server-deployment.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/metrics-server/metrics-server-deployment.yaml",
+        "size": 2556,
+        "sha256": "73b638212f6daafcba7af5f5b7cec86c8e22fd923e7d42e7697b776177c241c3"
+      },
+      {
+        "path": "manifests/metrics-server/metrics-apiservice.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/metrics-server/metrics-apiservice.yaml",
+        "size": 293,
+        "sha256": "03266df7891b56dfffebb855a031b524ed20c6736846417ccd491dd91c6c0ec3"
+      },
+      {
+        "path": "manifests/traefik.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/traefik.yaml",
+        "size": 1141,
+        "sha256": "e398aa7f8f6686c480ea666984b55cda9ca7b561dbd5b4308455262533edda17"
+      }
+    ]
+  },
+  "qualification": "Official upstream artifact admission only; full lifecycle, component, custody and advisory-boundary evidence is required before profile adoption."
+}

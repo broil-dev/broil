@@ -1,11 +1,11 @@
 # Broil
 
 Broil is a project-local command runner for scripts, environment shells,
-configuration inspection, and remote machine operations.
+configuration inspection, remote machine operations, and encrypted secrets.
 
 ## Build From Source
 
-Broil is a Rust workspace. Use Rust 1.85 or newer:
+Broil is a Rust workspace. Use Rust 1.87 or newer:
 
 ```sh
 cargo build --release -p broil
@@ -68,10 +68,18 @@ BROIL_ENV=prod broil remote check --all
 
 ## Guides
 
+- [Secrets, optional vault access and migration](docs/secrets.md)
+- [Secret-store examples](docs/examples/secrets/README.md)
 - [Scripts and environments](docs/scripts-and-environments.md)
 - [Aliases](docs/aliases.md)
 - [Executable commands](docs/executable-commands.md)
 - [Get](docs/get.md)
+- [Create a K3s target](docs/k3s-create.md)
+- [Inspect and manage a K3s target](docs/k3s-manage.md)
+- [Publish to the managed registry](docs/k3s-registry-publish.md)
+- [Inspect K3s target declarations](docs/k3s.md)
+- [Join the next K3s server](docs/k3s-server-join.md)
+- [Inspect and recover K3s operation records](docs/k3s-operations.md)
 - [Command resolution](docs/command-resolution.md)
 - [Remotes](docs/remotes.md)
 - [Remote example templates](docs/examples/remotes/README.md)

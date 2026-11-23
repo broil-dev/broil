@@ -1,6 +1,0 @@
-schema=broil-ssh-package-mapping-v1
-vendored_package=russh 0.62.5
-registry_package=registry+https://github.com/rust-lang/crates.io-index#russh@0.62.5
-registry_archive_sha256=da7c230e0ed9cbeb92fbad6c8848985d6df2a1464c0dc247a021abd666e9005e
-mapping_status=verified
-rustsec_path_source_limitation=explicit crates.io identity mapping required

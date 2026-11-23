@@ -157,14 +157,33 @@ pub fn execute(
     args: &[OsString],
     base_env: &[(OsString, OsString)],
 ) -> Result<i32, ExecutionError> {
+    execute_with_inputs(
+        path,
+        broil_root,
+        config,
+        active,
+        args,
+        base_env,
+        crate::injection::Inputs::borrowed(broil_root, base_env),
+    )
+}
+
+pub fn execute_with_inputs(
+    path: &Path,
+    broil_root: &Path,
+    config: &BroilConfig,
+    active: Option<&OsStr>,
+    args: &[OsString],
+    base_env: &[(OsString, OsString)],
+    inputs: crate::injection::Inputs<'_>,
+) -> Result<i32, ExecutionError> {
     let resolved = execenv::resolve(config, active)?;
     let env = execenv::child_env(base_env, &resolved, broil_root);
-    let mut child = Command::new(path)
-        .args(args)
-        .current_dir(broil_root)
-        .env_clear()
-        .envs(&env)
-        .spawn()
+    let injection = crate::injection::Injection::resolve(config, broil_root, active, inputs)?;
+    let mut command = Command::new(path);
+    command.args(args).current_dir(broil_root);
+    let mut child = injection
+        .spawn(command, &env)
         .map_err(|error| spawn_error("launch", path, &error))?;
     let status = child
         .wait()

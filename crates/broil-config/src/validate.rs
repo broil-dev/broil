@@ -23,11 +23,16 @@ pub(crate) fn validate(root: &RawValue) -> Result<BroilConfig, ConfigError> {
     for (key, value) in pairs {
         let name = string_key(key, "config root")?;
         match name {
+            "tools" => config.tools = crate::images::tools(value, "tools")?,
             "aliases" => config.aliases = alias_map(value, "aliases")?,
             "scripts" => config.scripts = script_map(value, "scripts")?,
             "env_vars" => config.env_vars = env_var_map(value, "env_vars")?,
             "environments" => config.environments = environments(value)?,
+            "secrets" => config.secrets = crate::secrets::validate(value, "secrets")?,
             "remote" => config.remote = crate::remote::root(value, "remote")?,
+            "images" => config.images = crate::images::images(value, "images")?,
+            "builders" => config.builders = crate::images::builders(value, "builders")?,
+            "registries" => config.registries = crate::images::registries(value, "registries")?,
             _ => {
                 return Err(schema(SchemaError::UnknownKey {
                     key_path: name.to_string(),
@@ -36,6 +41,7 @@ pub(crate) fn validate(root: &RawValue) -> Result<BroilConfig, ConfigError> {
         }
     }
     crate::remote::validate_references_and_routes(&config)?;
+    crate::k3s::select::validate_ownership(&config)?;
     config.normalized = normalized_config(root)?;
     Ok(config)
 }
@@ -175,11 +181,27 @@ fn environments(value: &RawValue) -> Result<BTreeMap<String, EnvironmentConfig>,
             let section = string_key(env_key, &env_path)?;
             let section_path = format!("{env_path}.{section}");
             match section {
+                "k3s" => environment.k3s = crate::k3s::targets(env_value, &section_path)?,
+                "applications" => {
+                    environment.applications =
+                        crate::k3s::applications::applications(env_value, &section_path)?
+                }
+                "tools" => environment.tools = crate::images::tools(env_value, &section_path)?,
                 "aliases" => environment.aliases = alias_map(env_value, &section_path)?,
                 "scripts" => environment.scripts = script_map(env_value, &section_path)?,
                 "env_vars" => environment.env_vars = env_var_map(env_value, &section_path)?,
+                "secrets" => {
+                    environment.secrets = crate::secrets::validate(env_value, &section_path)?
+                }
                 "remote" => {
                     environment.remote = crate::remote::environment(env_value, &section_path)?
+                }
+                "images" => environment.images = crate::images::images(env_value, &section_path)?,
+                "builders" => {
+                    environment.builders = crate::images::builders(env_value, &section_path)?
+                }
+                "registries" => {
+                    environment.registries = crate::images::registries(env_value, &section_path)?
                 }
                 _ => {
                     return Err(schema(SchemaError::UnknownKey {
@@ -188,6 +210,7 @@ fn environments(value: &RawValue) -> Result<BTreeMap<String, EnvironmentConfig>,
                 }
             }
         }
+        crate::k3s::applications::cross_check(&environment, name)?;
         environments.insert(name.to_string(), environment);
     }
     Ok(environments)
@@ -202,6 +225,8 @@ fn normalized_config(root: &RawValue) -> Result<ConfigValue, ConfigError> {
         materialize_mapping(root, section);
     }
     materialize_remote(root, false);
+    materialize_secrets(root);
+    crate::images::normalize(root);
     if let Some(ConfigValue::Mapping(environments)) = root.get_mut("environments") {
         for environment in environments.values_mut() {
             if !matches!(environment, ConfigValue::Mapping(_)) {
@@ -210,10 +235,13 @@ fn normalized_config(root: &RawValue) -> Result<ConfigValue, ConfigError> {
             let ConfigValue::Mapping(environment) = environment else {
                 unreachable!()
             };
-            for section in ["aliases", "scripts", "env_vars"] {
+            for section in ["aliases", "scripts", "env_vars", "applications"] {
                 materialize_mapping(environment, section);
             }
             materialize_remote(environment, true);
+            materialize_secrets(environment);
+            crate::images::normalize(environment);
+            crate::k3s::normalize(environment);
         }
     }
     Ok(value)
@@ -340,4 +368,18 @@ fn alias_map_pairs(
         aliases.insert(segment.to_string(), node);
     }
     Ok(aliases)
+}
+
+fn materialize_secrets(map: &mut BTreeMap<String, ConfigValue>) {
+    materialize_mapping(map, "secrets");
+    let Some(ConfigValue::Mapping(secrets)) = map.get_mut("secrets") else {
+        unreachable!()
+    };
+    for section in ["exports", "vault", "rotation"] {
+        materialize_mapping(secrets, section);
+    }
+    let Some(ConfigValue::Mapping(rotation)) = secrets.get_mut("rotation") else {
+        unreachable!()
+    };
+    materialize_mapping(rotation, "handlers");
 }

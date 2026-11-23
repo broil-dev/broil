@@ -328,6 +328,38 @@ pub struct PrivilegeContext {
 }
 
 impl PrivilegeContext {
+    pub fn with_store_context(mut self, store: crate::secret::StoreContext) -> Self {
+        if self.privilege_profiles.values().any(|profile| {
+            profile
+                .password
+                .as_ref()
+                .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+        }) {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_store_context_for_profiles(
+        mut self,
+        store: crate::secret::StoreContext,
+        profiles: &[&str],
+    ) -> Self {
+        if profiles
+            .iter()
+            .filter_map(|name| self.privilege_profiles.get(*name))
+            .any(|profile| {
+                profile
+                    .password
+                    .as_ref()
+                    .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+            })
+        {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
     pub fn from_project(
         project: &LoadedProject,
         environment: &str,

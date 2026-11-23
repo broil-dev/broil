@@ -112,7 +112,7 @@ fn absolutize(path: &Path, base: Option<&Path>) -> PathBuf {
     }
 }
 
-fn normalize(path: &Path) -> PathBuf {
+pub(crate) fn normalize(path: &Path) -> PathBuf {
     let mut normalized = PathBuf::new();
     for component in path.components() {
         match component {

@@ -1,7 +1,0 @@
-Only in $COMMITTED_VENDOR: LICENSE.txt
-Files $PRISTINE_ARCHIVE_TREE/src/auth.rs and $COMMITTED_VENDOR/src/auth.rs differ
-Files $PRISTINE_ARCHIVE_TREE/src/client/encrypted.rs and $COMMITTED_VENDOR/src/client/encrypted.rs differ
-Files $PRISTINE_ARCHIVE_TREE/src/client/mod.rs and $COMMITTED_VENDOR/src/client/mod.rs differ
-Files $PRISTINE_ARCHIVE_TREE/src/keys/format/mod.rs and $COMMITTED_VENDOR/src/keys/format/mod.rs differ
-Files $PRISTINE_ARCHIVE_TREE/src/keys/format/pkcs5.rs and $COMMITTED_VENDOR/src/keys/format/pkcs5.rs differ
-Files $PRISTINE_ARCHIVE_TREE/src/keys/mod.rs and $COMMITTED_VENDOR/src/keys/mod.rs differ

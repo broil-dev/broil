@@ -1,3 +1,4 @@
+// Modified by the Broil project from russh 0.62.5; see LICENSE.txt and docs/provenance/russh-0.62.5.md for provenance.
 // Copyright 2016 Pierre-Étienne Meunier
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -365,6 +366,7 @@ const MAXIMUM_PACKET_LEN_HEADROOM: usize =
 const MAXIMUM_PACKET_LEN: usize = MAXIMUM_PACKET_LEN_BASELINE + MAXIMUM_PACKET_LEN_HEADROOM;
 // Keep post-decompression growth within the same packet-acceptance model as
 // the transport read path.
+#[cfg(feature = "flate2")]
 pub(crate) const MAXIMUM_DECOMPRESSED_PACKET_LEN: usize = MAXIMUM_PACKET_LEN;
 
 #[cfg(feature = "_bench")]

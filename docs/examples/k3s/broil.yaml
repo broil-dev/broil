@@ -1,0 +1,109 @@
+registries:
+  local:
+    endpoint: https://registry.example.test
+    ca: missing-ca.pem
+    auth:
+      push:
+        repositories: [registry.example.test/team/app]
+        username: publisher
+        password: {set: example/lab, key: publish-password}
+        token_service:
+          realm: https://registry.example.test/auth
+          service: registry.example.test
+remote:
+  defaults: {canonical_auth: deploy}
+  auth_profiles:
+    deploy:
+      user: deploy
+      public_key:
+        identities: [{file: {path: missing-key}}]
+  privilege_profiles:
+    root: {method: sudo}
+  scripts:
+    lifecycle: {body: "exit 99", pty: never}
+environments:
+  lab:
+    remote:
+      machines:
+        host: {address: 192.0.2.10}
+        backup: {address: 192.0.2.20}
+    k3s:
+      demo:
+        version: v1.36.4+k3s1
+        members:
+          - machine: host
+            role: server
+            name: server-1
+            node_ip: 192.0.2.10
+            interface: eth0
+        api:
+          endpoint: https://api.example.test:6443
+          tls_sans: [api.example.test, 192.0.2.10]
+        registration_endpoint: https://192.0.2.10:6443
+        network:
+          pod_cidr: 10.42.0.0/16
+          service_cidr: 10.43.0.0/16
+          cluster_dns: 10.43.0.10
+        infrastructure:
+          cert_manager_version: v1.21.2
+          ingress_members: [server-1]
+          issuers:
+            ca:
+              kind: private-ca
+              certificate: {set: example/tls, key: ca-certificate}
+              key: {set: example/tls, key: ca-key}
+            acme:
+              kind: acme-http01
+              server: https://acme.example.test/directory
+              email: operator@example.test
+              account_key: {set: example/tls, key: account-key}
+          certificates:
+            registry:
+              issuer: ca
+              dns_names: [registry.example.test]
+        credentials:
+          server_token: {set: example/lab, key: server-token}
+          agent_token: {set: example/lab, key: agent-token}
+        privilege: root
+        lifecycle_script: lifecycle
+        bootstrap:
+          mode: online
+          manifest: missing-manifest.json
+        backup:
+          machine: backup
+          path: /srv/backup/demo
+          recipient: age1h7hjqp0np9tpcqqv3e5j8jh56jnv6vnxf29fhs5ppczqm6agmccsajslfr
+          identity: {set: example/recovery, key: age-identity}
+        registry:
+          name: distribution
+          endpoint: local
+          version: v3.1.1
+          image: broil.invalid/candidate/distribution@sha256:ac52bec3025b9dc75a26112e076e3e0af646fbb40af67ae9f2fcd6465963b839
+          member: server-1
+          storage: {path: /srv/registry/demo, capacity_mib: 1024}
+          certificate: registry
+          authentication:
+            profile: docker-auth
+            signing_key: {set: example/lab, key: signing-key}
+            signing_certificate: signer.crt
+            principals:
+              publisher:
+                purpose: publication
+                password: {set: example/lab, key: publish-password}
+                repositories: [registry.example.test/team/app]
+                actions: [pull, push]
+              runtime:
+                purpose: node-pull
+                password: {set: example/lab, key: pull-password}
+                repositories: [registry.example.test/team/app]
+                actions: [pull]
+              janitor:
+                purpose: maintenance
+                password: {set: example/lab, key: maintenance-password}
+                repositories: [registry.example.test/team/app]
+                actions: [pull, delete]
+        node_registries:
+          - registry: local
+            repositories: [registry.example.test/team/app]
+            username: runtime
+            password: {set: example/lab, key: pull-password}

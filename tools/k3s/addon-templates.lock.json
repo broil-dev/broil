@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "templates": {
+    "v1.35.7+k3s1": {
+      "traefik": {
+        "path": "templates/traefik.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/cd43afc7151132bac92feacd3e4d2127ea1e70d0/manifests/traefik.yaml",
+        "size": 1141,
+        "sha256": "e398aa7f8f6686c480ea666984b55cda9ca7b561dbd5b4308455262533edda17"
+      },
+      "metrics-server": {
+        "path": "templates/metrics-server.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/cd43afc7151132bac92feacd3e4d2127ea1e70d0/manifests/metrics-server/metrics-server-deployment.yaml",
+        "size": 2556,
+        "sha256": "73b638212f6daafcba7af5f5b7cec86c8e22fd923e7d42e7697b776177c241c3"
+      },
+      "metrics-api": {
+        "path": "templates/metrics-api.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/cd43afc7151132bac92feacd3e4d2127ea1e70d0/manifests/metrics-server/metrics-apiservice.yaml",
+        "size": 293,
+        "sha256": "03266df7891b56dfffebb855a031b524ed20c6736846417ccd491dd91c6c0ec3"
+      }
+    },
+    "v1.35.8+k3s1": {
+      "traefik": {
+        "path": "templates/traefik.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/e952d68a5a5f8953c4549cf8fb557f3eae417107/manifests/traefik.yaml",
+        "size": 1141,
+        "sha256": "e398aa7f8f6686c480ea666984b55cda9ca7b561dbd5b4308455262533edda17"
+      },
+      "metrics-server": {
+        "path": "templates/metrics-server.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/e952d68a5a5f8953c4549cf8fb557f3eae417107/manifests/metrics-server/metrics-server-deployment.yaml",
+        "size": 2556,
+        "sha256": "73b638212f6daafcba7af5f5b7cec86c8e22fd923e7d42e7697b776177c241c3"
+      },
+      "metrics-api": {
+        "path": "templates/metrics-api.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/e952d68a5a5f8953c4549cf8fb557f3eae417107/manifests/metrics-server/metrics-apiservice.yaml",
+        "size": 293,
+        "sha256": "03266df7891b56dfffebb855a031b524ed20c6736846417ccd491dd91c6c0ec3"
+      }
+    },
+    "v1.36.4+k3s1": {
+      "traefik": {
+        "path": "templates/traefik.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/traefik.yaml",
+        "size": 1141,
+        "sha256": "e398aa7f8f6686c480ea666984b55cda9ca7b561dbd5b4308455262533edda17"
+      },
+      "metrics-server": {
+        "path": "templates/metrics-server.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/metrics-server/metrics-server-deployment.yaml",
+        "size": 2556,
+        "sha256": "73b638212f6daafcba7af5f5b7cec86c8e22fd923e7d42e7697b776177c241c3"
+      },
+      "metrics-api": {
+        "path": "templates/metrics-api.yaml",
+        "url": "https://raw.githubusercontent.com/k3s-io/k3s/4dedb15be78017a8ddd5b9e81acd44f3481078ed/manifests/metrics-server/metrics-apiservice.yaml",
+        "size": 293,
+        "sha256": "03266df7891b56dfffebb855a031b524ed20c6736846417ccd491dd91c6c0ec3"
+      }
+    }
+  }
+}

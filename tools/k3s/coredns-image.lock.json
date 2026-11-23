@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "status": "unadopted-official-image-candidate",
+  "source": {
+    "source_commit": "427fc80ed9ca47f354585eb30a3f1332950856c4",
+    "source_url": "https://codeload.github.com/coredns/coredns/tar.gz/427fc80ed9ca47f354585eb30a3f1332950856c4",
+    "source_sha256": "02a8b5266cf3beb165683d459cf4ab17e0350b2a677d741cc8936f5ccc165e52",
+    "source_size": 937763,
+    "files": {
+      "go.mod": {
+        "sha256": "6a56d50b8c9a4d7651b58027fa732a813f1f5341a2336bed726f610f4a9027ae",
+        "size": 11573
+      },
+      "go.sum": {
+        "sha256": "6c20b6ac556258e023b6341a7abca1398e87814696c6512b282f3796bc5cc667",
+        "size": 63536
+      },
+      "LICENSE": {
+        "sha256": "f0530760b1e2ffcf23df322db638ee06d06fc07fead0ed3ddd710f2e224698a9",
+        "size": 11371
+      },
+      "Dockerfile": {
+        "sha256": "b8da0c899ba195f843edc67ec344bcdea9cb3e1f068aad140ec04bd00f548cc4",
+        "size": 1023
+      },
+      "plugin/kubernetes/kubernetes.go": {
+        "sha256": "4540d33bf2f4a5c0f8f6eb2e4dc0f2177795ab389fe206ddd684217cb8574319",
+        "size": 23220
+      },
+      "plugin/kubernetes/controller.go": {
+        "sha256": "970468e5f48ab9807e7384c24ed931d652ac5e12dccdaf3b28805f13ea04b754",
+        "size": 27236
+      },
+      "core/dnsserver/server.go": {
+        "sha256": "9b3dee22fd9086e70972bcfe0cc863f086b925331be955a3975d96f8bb787730",
+        "size": 15779
+      }
+    }
+  },
+  "image": {
+    "repository": "coredns/coredns",
+    "tag": "1.14.7",
+    "index_sha256": "7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286",
+    "manifest": {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 3023,
+      "digest": "sha256:2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    },
+    "config": {
+      "mediaType": "application/vnd.docker.container.image.v1+json",
+      "size": 3062,
+      "digest": "sha256:97efff2babf85310d6f87bd969ac64d7006bbbadb147c90579d68d57634750f4"
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 84784,
+        "digest": "sha256:ad7fcb30079d111d23da3e519d0dbb3105d283cd42f1da33cf2e2030c14e9b57"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 12579,
+        "digest": "sha256:2e4cf50eeb92ac3a7afe75e15d96a26dee99449f86b46c75b5d95f4418a5bca0"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 463397,
+        "digest": "sha256:c36c4b61cfbac73652d6a28923cd773657fa593c6ba5634672941f33bd8b3656"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 28389,
+        "digest": "sha256:e1089d61b200106053b1717881bf0c1c47551478f01569d9224d33cccf3e4692"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 75,
+        "digest": "sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 193,
+        "digest": "sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 130,
+        "digest": "sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 168,
+        "digest": "sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 84,
+        "digest": "sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 358,
+        "digest": "sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 320,
+        "digest": "sha256:6b72b81ed96620b324f40ade069bbd3fcee69d62182bb03681c3976b6909eec4"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 136427,
+        "digest": "sha256:77964957095d7872770920c8f55d28613e85f8e27aa0b157a440e0d635193fa9"
+      },
+      {
+        "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+        "size": 23526263,
+        "digest": "sha256:99b3e33606b7d973e48aae22cef2c9531f934fcddac7c64b7d19852d579cd513"
+      }
+    ],
+    "runtime_config": {
+      "User": "65532:65532",
+      "ExposedPorts": {
+        "53/tcp": {},
+        "53/udp": {}
+      },
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+      ],
+      "Entrypoint": [
+        "/coredns"
+      ],
+      "WorkingDir": "/"
+    },
+    "executable": {
+      "sha256": "67d7387acb5d58df2c884cd2f0a4a4815f6a6bb29b865a6ea5efa4e782d76faa",
+      "size": 76677282,
+      "go_version": "go1.26.6"
+    },
+    "method": "Read-only OCI descriptor/layer/build-metadata inspection; no candidate executed."
+  },
+  "inputs": [
+    {
+      "path": "index.json",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/manifests/sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286",
+      "sha256": "7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286",
+      "size": 2319
+    },
+    {
+      "path": "manifest.json",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/manifests/sha256:2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+      "sha256": "2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+      "size": 3023
+    },
+    {
+      "path": "config.json",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:97efff2babf85310d6f87bd969ac64d7006bbbadb147c90579d68d57634750f4",
+      "sha256": "97efff2babf85310d6f87bd969ac64d7006bbbadb147c90579d68d57634750f4",
+      "size": 3062
+    },
+    {
+      "path": "ad7fcb30079d111d23da3e519d0dbb3105d283cd42f1da33cf2e2030c14e9b57.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:ad7fcb30079d111d23da3e519d0dbb3105d283cd42f1da33cf2e2030c14e9b57",
+      "sha256": "ad7fcb30079d111d23da3e519d0dbb3105d283cd42f1da33cf2e2030c14e9b57",
+      "size": 84784
+    },
+    {
+      "path": "2e4cf50eeb92ac3a7afe75e15d96a26dee99449f86b46c75b5d95f4418a5bca0.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:2e4cf50eeb92ac3a7afe75e15d96a26dee99449f86b46c75b5d95f4418a5bca0",
+      "sha256": "2e4cf50eeb92ac3a7afe75e15d96a26dee99449f86b46c75b5d95f4418a5bca0",
+      "size": 12579
+    },
+    {
+      "path": "c36c4b61cfbac73652d6a28923cd773657fa593c6ba5634672941f33bd8b3656.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:c36c4b61cfbac73652d6a28923cd773657fa593c6ba5634672941f33bd8b3656",
+      "sha256": "c36c4b61cfbac73652d6a28923cd773657fa593c6ba5634672941f33bd8b3656",
+      "size": 463397
+    },
+    {
+      "path": "e1089d61b200106053b1717881bf0c1c47551478f01569d9224d33cccf3e4692.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:e1089d61b200106053b1717881bf0c1c47551478f01569d9224d33cccf3e4692",
+      "sha256": "e1089d61b200106053b1717881bf0c1c47551478f01569d9224d33cccf3e4692",
+      "size": 28389
+    },
+    {
+      "path": "0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5",
+      "sha256": "0f8b424aa0b96c1c388a5fd4d90735604459256336853082afb61733438872b5",
+      "size": 75
+    },
+    {
+      "path": "d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21",
+      "sha256": "d557676654e572af3e3173c90e7874644207fda32cd87e9d3d66b5d7b98a7b21",
+      "size": 193
+    },
+    {
+      "path": "d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213",
+      "sha256": "d82bc7a76a838c9a4a6025192429c2fed58f73742ef1fb9c8bb7b995fc3b7213",
+      "size": 130
+    },
+    {
+      "path": "68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7",
+      "sha256": "68e4cd60e60fed4486d5b4b40b079e57781e828d93d80a7411e8760dcccfbbf7",
+      "size": 168
+    },
+    {
+      "path": "0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e",
+      "sha256": "0783a66ae7492bb16937c7723c534e431404aa3ebbdcaaed65d264a95a266b9e",
+      "size": 84
+    },
+    {
+      "path": "efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105",
+      "sha256": "efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105",
+      "size": 358
+    },
+    {
+      "path": "6b72b81ed96620b324f40ade069bbd3fcee69d62182bb03681c3976b6909eec4.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:6b72b81ed96620b324f40ade069bbd3fcee69d62182bb03681c3976b6909eec4",
+      "sha256": "6b72b81ed96620b324f40ade069bbd3fcee69d62182bb03681c3976b6909eec4",
+      "size": 320
+    },
+    {
+      "path": "77964957095d7872770920c8f55d28613e85f8e27aa0b157a440e0d635193fa9.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:77964957095d7872770920c8f55d28613e85f8e27aa0b157a440e0d635193fa9",
+      "sha256": "77964957095d7872770920c8f55d28613e85f8e27aa0b157a440e0d635193fa9",
+      "size": 136427
+    },
+    {
+      "path": "99b3e33606b7d973e48aae22cef2c9531f934fcddac7c64b7d19852d579cd513.layer",
+      "url": "https://registry-1.docker.io/v2/coredns/coredns/blobs/sha256:99b3e33606b7d973e48aae22cef2c9531f934fcddac7c64b7d19852d579cd513",
+      "sha256": "99b3e33606b7d973e48aae22cef2c9531f934fcddac7c64b7d19852d579cd513",
+      "size": 23526263
+    }
+  ],
+  "inspection_go": {
+    "version": "1.27.1",
+    "source_commit": "862c888e612ac346c7c4d99c9392bdfd265f33b0",
+    "url": "https://go.dev/dl/go1.27.1.linux-amd64.tar.gz",
+    "sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+    "source_url": "https://go.dev/dl/go1.27.1.src.tar.gz",
+    "source_sha256": "4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1"
+  },
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOSUMDB": "off",
+    "GOPROXY": "off",
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOOS": "linux",
+    "GOARCH": "amd64"
+  },
+  "qualification": "Pinned image/source acquisition and scanner input. No image, runtime or adoption acceptance.",
+  "bundled_templates": {
+    "v1.35.7+k3s1": {
+      "path": "templates/v1.35.7-coredns.yaml",
+      "sha256": "26c9c51065ace186a5301c45497f63abc88cb0cac23259df2da73b8d2c793a5b",
+      "size": 5123
+    },
+    "v1.35.8+k3s1": {
+      "path": "templates/v1.35.8-coredns.yaml",
+      "sha256": "f726a65f4fe05f646a34f09306645545d8d2e70d3c59c32592d97419ad3b8968",
+      "size": 5240
+    },
+    "v1.36.4+k3s1": {
+      "path": "templates/v1.36.4-coredns.yaml",
+      "sha256": "f726a65f4fe05f646a34f09306645545d8d2e70d3c59c32592d97419ad3b8968",
+      "size": 5240
+    }
+  }
+}

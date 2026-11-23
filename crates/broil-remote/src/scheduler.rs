@@ -1,12 +1,14 @@
 // Copyright 2026 Broil contributors
 // SPDX-License-Identifier: Apache-2.0
 use std::future::Future;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex, Weak};
 use std::task::Poll;
 
 use tokio::sync::watch;
 use tokio::task::JoinSet;
+
+type StoreCleanup = dyn Fn() + Send + Sync;
 
 #[derive(Clone)]
 pub struct CancellationToken {
@@ -17,6 +19,7 @@ pub struct CancellationToken {
 struct CancellationState {
     cancelled: AtomicBool,
     sender: watch::Sender<bool>,
+    store_cleanups: Mutex<Vec<Weak<StoreCleanup>>>,
 }
 
 impl std::fmt::Debug for CancellationToken {
@@ -35,6 +38,7 @@ impl Default for CancellationToken {
             state: Arc::new(CancellationState {
                 cancelled: AtomicBool::new(false),
                 sender,
+                store_cleanups: Mutex::new(Vec::new()),
             }),
             parents: Vec::new(),
         }
@@ -51,6 +55,7 @@ impl CancellationToken {
             state: Arc::new(CancellationState {
                 cancelled: AtomicBool::new(false),
                 sender,
+                store_cleanups: Mutex::new(Vec::new()),
             }),
             parents,
         }
@@ -68,6 +73,40 @@ impl CancellationToken {
                 .parents
                 .iter()
                 .any(|parent| parent.cancelled.load(Ordering::SeqCst))
+    }
+
+    pub(crate) fn register_store_cleanup(&self, cleanup: &Arc<StoreCleanup>) -> bool {
+        for state in self
+            .parents
+            .iter()
+            .rev()
+            .chain(std::iter::once(&self.state))
+        {
+            let mut cleanups = state
+                .store_cleanups
+                .lock()
+                .unwrap_or_else(|p| p.into_inner());
+            if self.is_cancelled() {
+                return false;
+            }
+            cleanups.retain(|item| item.strong_count() != 0);
+            cleanups.push(Arc::downgrade(cleanup));
+        }
+        true
+    }
+
+    pub(crate) fn drain_store_workers(&self) {
+        let cleanups = self
+            .state
+            .store_cleanups
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone();
+        for cleanup in cleanups {
+            if let Some(cleanup) = cleanup.upgrade() {
+                cleanup();
+            }
+        }
     }
 
     pub async fn cancelled(&self) {

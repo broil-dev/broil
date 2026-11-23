@@ -3,15 +3,16 @@
 use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
 use std::fmt;
-use std::fs::File;
 use std::io::{self, IsTerminal, Read, Write};
-use std::os::fd::{AsFd, AsRawFd, BorrowedFd, OwnedFd};
-use std::path::{Component, Path, PathBuf};
+use std::os::fd::{AsFd, BorrowedFd, OwnedFd};
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use broil_core::remote::SecretProvider;
+pub use broil_core::secret::{OwnedSecret, normalize_path, restore_global_input_terminal};
+use broil_core::secret::{SecretNormalizationError, label_writer};
 use tokio::sync::watch;
 use zeroize::Zeroizing;
 
@@ -19,11 +20,11 @@ use crate::FailureClass;
 use crate::path_safety::{CapabilityError, defensive_open};
 use crate::scheduler::CancellationToken;
 
+pub mod store;
+pub use store::StoreContext;
+
 const MAX_SECRET_BYTES: usize = 64 * 1024;
 const CANCELLABLE_READ_SLEEP: Duration = Duration::from_millis(25);
-
-static INPUT_GUARD: Mutex<()> = Mutex::new(());
-static INPUT_TERMINAL_STATE: Mutex<Option<InputTerminalState>> = Mutex::new(None);
 
 #[derive(Debug)]
 pub struct SecretFailure {
@@ -52,38 +53,6 @@ impl fmt::Display for SecretFailure {
 
 impl std::error::Error for SecretFailure {}
 
-pub struct OwnedSecret {
-    value: Zeroizing<String>,
-}
-
-impl OwnedSecret {
-    pub fn from_zeroizing(value: Zeroizing<String>) -> Self {
-        Self { value }
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.value
-    }
-
-    pub fn len(&self) -> usize {
-        self.value.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.value.is_empty()
-    }
-
-    pub fn into_bytes(mut self) -> Zeroizing<Vec<u8>> {
-        Zeroizing::new(std::mem::take(&mut *self.value).into_bytes())
-    }
-}
-
-impl fmt::Debug for OwnedSecret {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("OwnedSecret([REDACTED])")
-    }
-}
-
 #[derive(Clone)]
 pub struct SecretContext {
     root: PathBuf,
@@ -91,6 +60,8 @@ pub struct SecretContext {
     providers: BTreeMap<String, SecretProvider>,
     prompt_terminal: Option<PromptTerminal>,
     paced_clock: Option<PacedClock>,
+    store: Option<StoreContext>,
+    non_interactive: bool,
 }
 
 impl SecretContext {
@@ -105,7 +76,45 @@ impl SecretContext {
             providers,
             prompt_terminal: None,
             paced_clock: None,
+            store: None,
+            non_interactive: false,
         }
+    }
+
+    pub fn with_store_context(mut self, mut store: StoreContext) -> Self {
+        store.non_interactive = self.non_interactive;
+        if self
+            .providers
+            .values()
+            .any(|p| matches!(p, SecretProvider::Store { .. }))
+        {
+            self.store = Some(store);
+        }
+        self
+    }
+
+    pub fn with_non_interactive(mut self, non_interactive: bool) -> Self {
+        self.non_interactive = non_interactive;
+        if let Some(store) = self.store.as_mut() {
+            store.non_interactive = non_interactive;
+        }
+        self
+    }
+
+    pub fn with_store_context_for_providers(
+        mut self,
+        mut store: StoreContext,
+        providers: &[&str],
+    ) -> Self {
+        store.non_interactive = self.non_interactive;
+        if providers.iter().any(|name| self.is_store_provider(name)) {
+            self.store = Some(store);
+        }
+        self
+    }
+
+    pub(crate) fn is_store_provider(&self, name: &str) -> bool {
+        matches!(self.providers.get(name), Some(SecretProvider::Store { .. }))
     }
 
     pub fn with_paced_clock(mut self, clock: PacedClock) -> Self {
@@ -138,6 +147,14 @@ impl SecretContext {
             return Err(cancelled_provider(name));
         }
         let provider = self.provider(name)?.clone();
+        if let SecretProvider::Store { key, set } = provider {
+            let context = self
+                .store
+                .clone()
+                .ok_or_else(|| provider_failure(name, "secret unavailable"))?;
+            return store::resolve_owned(context, name, key, set, cancel, self.paced_clock.clone())
+                .await;
+        }
         let _pause = self
             .paced_clock
             .as_ref()
@@ -159,6 +176,12 @@ impl SecretContext {
     }
 
     pub fn provider_is_human_paced(&self, name: &str) -> bool {
+        if self.non_interactive {
+            return false;
+        }
+        if matches!(self.providers.get(name), Some(SecretProvider::Store { .. })) {
+            return self.store.as_ref().is_some_and(StoreContext::may_prompt);
+        }
         matches!(
             self.providers.get(name),
             Some(SecretProvider::Prompt { .. }) | Some(SecretProvider::Helper { .. })
@@ -352,6 +375,12 @@ fn resolve_provider_cancellable(
     }
     let bytes = match provider {
         SecretProvider::Prompt { label } => {
+            if context.non_interactive {
+                return Err(provider_failure(
+                    name,
+                    "prompt provider is unavailable non-interactively",
+                ));
+            }
             prompt_secret_cancellable(label, context.prompt_terminal.as_ref(), cancel).map_err(
                 |error| provider_io_failure(name, "prompt provider is unavailable", error),
             )?
@@ -364,6 +393,19 @@ fn resolve_provider_cancellable(
             .map_err(|error| {
             provider_io_failure(name, "helper provider is unavailable", error)
         })?,
+        SecretProvider::Store { key, set } => {
+            return context
+                .store
+                .as_ref()
+                .ok_or_else(|| provider_failure(name, "secret unavailable"))?
+                .resolve(
+                    name,
+                    key,
+                    set.as_deref(),
+                    cancel,
+                    context.paced_clock.clone(),
+                );
+        }
     };
     normalize_secret(name, bytes)
 }
@@ -423,16 +465,6 @@ fn prompt_secret_cancellable(
     }
 }
 
-fn label_writer(dup: io::Result<OwnedFd>) -> io::Result<Box<dyn Write + Send>> {
-    match dup {
-        Ok(fd) => Ok(Box::new(File::from(fd))),
-        Err(error) if error.raw_os_error() == Some(rustix::io::Errno::BADF.raw_os_error()) => {
-            Ok(Box::new(io::sink()))
-        }
-        Err(error) => Err(error),
-    }
-}
-
 fn prompt_secret_from_fd(
     label: &str,
     fd: BorrowedFd<'_>,
@@ -440,14 +472,16 @@ fn prompt_secret_from_fd(
     stderr: &mut dyn Write,
     cancel: &CancellationToken,
 ) -> io::Result<Zeroizing<Vec<u8>>> {
-    if !is_terminal {
-        return Err(io::Error::other("stdin is not a terminal"));
-    }
-    write!(stderr, "{label}: ")?;
-    stderr.flush()?;
-    let line = read_line_from_private_terminal_fd(fd, cancel, true)?;
-    writeln!(stderr)?;
-    Ok(line)
+    broil_core::secret::prompt_secret_from_fd(label, fd, is_terminal, stderr, &|| {
+        cancel.is_cancelled()
+    })
+}
+
+pub fn read_stdin_line_cancellable(
+    cancel: &CancellationToken,
+    hide_input: bool,
+) -> io::Result<Zeroizing<Vec<u8>>> {
+    broil_core::secret::read_stdin_line_cancellable(&|| cancel.is_cancelled(), hide_input)
 }
 
 fn helper_secret_cancellable(
@@ -493,96 +527,6 @@ fn helper_secret_cancellable(
         return Err(io::Error::other("helper failed"));
     }
     Ok(bytes)
-}
-
-pub fn read_stdin_line_cancellable(
-    cancel: &CancellationToken,
-    hide_input: bool,
-) -> io::Result<Zeroizing<Vec<u8>>> {
-    let stdin = io::stdin();
-    if !stdin.is_terminal() {
-        return Err(io::Error::other("stdin is not a terminal"));
-    }
-    read_line_from_private_terminal_fd(stdin.as_fd(), cancel, hide_input)
-}
-
-fn read_line_from_private_terminal_fd(
-    fd: BorrowedFd<'_>,
-    cancel: &CancellationToken,
-    hide_input: bool,
-) -> io::Result<Zeroizing<Vec<u8>>> {
-    let private_fd = open_private_terminal_fd(fd)?;
-    read_line_from_fd(private_fd.as_fd(), cancel, hide_input)
-}
-
-fn open_private_terminal_fd(fd: BorrowedFd<'_>) -> io::Result<OwnedFd> {
-    let flags =
-        rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::CLOEXEC | rustix::fs::OFlags::NOCTTY;
-    let proc_path = format!("/proc/self/fd/{}", fd.as_raw_fd());
-    match rustix::fs::open(proc_path.as_str(), flags, rustix::fs::Mode::empty()) {
-        Ok(private_fd) => Ok(private_fd),
-        Err(error) if fd.as_raw_fd() == 0 => {
-            match rustix::fs::open("/dev/tty", flags, rustix::fs::Mode::empty()) {
-                Ok(private_fd) => Ok(private_fd),
-                Err(_) => Err(io::Error::from(error)),
-            }
-        }
-        Err(error) => Err(io::Error::from(error)),
-    }
-}
-
-fn read_line_from_fd(
-    fd: BorrowedFd<'_>,
-    cancel: &CancellationToken,
-    hide_input: bool,
-) -> io::Result<Zeroizing<Vec<u8>>> {
-    let _guard = InputGuard::enter(fd, hide_input)?;
-    read_fd_until_line(fd, cancel)
-}
-
-fn read_fd_until_line(
-    fd: BorrowedFd<'_>,
-    cancel: &CancellationToken,
-) -> io::Result<Zeroizing<Vec<u8>>> {
-    let mut bytes = Zeroizing::new(Vec::with_capacity(MAX_SECRET_BYTES + 1));
-    let mut buffer = Zeroizing::new([0_u8; 1024]);
-    loop {
-        if cancel.is_cancelled() {
-            return Err(io::Error::new(io::ErrorKind::Interrupted, "cancelled"));
-        }
-        match rustix::io::read(fd, &mut buffer[..]) {
-            Ok(0) => return Ok(bytes),
-            Ok(read) => {
-                let chunk = &buffer[..read];
-                if let Some(index) = chunk.iter().position(|byte| *byte == b'\n') {
-                    bytes.extend_from_slice(&chunk[..=index]);
-                    if bytes.len() > MAX_SECRET_BYTES {
-                        return Err(io::Error::new(
-                            io::ErrorKind::InvalidData,
-                            "secret exceeds maximum size",
-                        ));
-                    }
-                    return Ok(bytes);
-                }
-                bytes.extend_from_slice(chunk);
-                if bytes.len() > MAX_SECRET_BYTES {
-                    return Err(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "secret exceeds maximum size",
-                    ));
-                }
-            }
-            Err(error)
-                if error == rustix::io::Errno::AGAIN || error == rustix::io::Errno::WOULDBLOCK =>
-            {
-                std::thread::sleep(CANCELLABLE_READ_SLEEP);
-            }
-            Err(error) if error == rustix::io::Errno::INTR => {
-                std::thread::sleep(CANCELLABLE_READ_SLEEP);
-            }
-            Err(error) => return Err(io::Error::from(error)),
-        }
-    }
 }
 
 fn read_bounded_cancellable<Fd: AsFd>(
@@ -637,70 +581,6 @@ fn wait_helper(
     }
 }
 
-struct InputTerminalState {
-    fd: OwnedFd,
-    original_termios: rustix::termios::Termios,
-    original_flags: rustix::fs::OFlags,
-    termios_changed: bool,
-}
-
-struct InputGuard {
-    _lock: MutexGuard<'static, ()>,
-    active: bool,
-}
-
-impl InputGuard {
-    fn enter(fd: BorrowedFd<'_>, hide_input: bool) -> io::Result<Self> {
-        let lock = INPUT_GUARD.lock().expect("input guard mutex poisoned");
-        let restore_fd = rustix::io::fcntl_dupfd_cloexec(fd, 0).map_err(io::Error::from)?;
-        let original_termios = rustix::termios::tcgetattr(fd)
-            .map_err(|_| io::Error::other("cannot read terminal mode"))?;
-        let original_flags = rustix::fs::fcntl_getfl(fd).map_err(io::Error::from)?;
-        *INPUT_TERMINAL_STATE
-            .lock()
-            .expect("input terminal state mutex poisoned") = Some(InputTerminalState {
-            fd: restore_fd,
-            original_termios: original_termios.clone(),
-            original_flags,
-            termios_changed: hide_input,
-        });
-        if hide_input {
-            let mut updated_termios = original_termios.clone();
-            updated_termios
-                .local_modes
-                .remove(rustix::termios::LocalModes::ECHO);
-            if rustix::termios::tcsetattr(
-                fd,
-                rustix::termios::OptionalActions::Flush,
-                &updated_termios,
-            )
-            .is_err()
-            {
-                restore_global_input_terminal();
-                return Err(io::Error::other("cannot update terminal mode"));
-            }
-        }
-        if let Err(error) =
-            rustix::fs::fcntl_setfl(fd, original_flags | rustix::fs::OFlags::NONBLOCK)
-        {
-            restore_global_input_terminal();
-            return Err(io::Error::from(error));
-        }
-        Ok(Self {
-            _lock: lock,
-            active: true,
-        })
-    }
-}
-
-impl Drop for InputGuard {
-    fn drop(&mut self) {
-        if self.active {
-            restore_global_input_terminal();
-        }
-    }
-}
-
 struct NonblockingGuard<Fd: AsFd> {
     fd: Fd,
     original_flags: rustix::fs::OFlags,
@@ -728,23 +608,6 @@ impl<Fd: AsFd> Drop for NonblockingGuard<Fd> {
     }
 }
 
-pub fn restore_global_input_terminal() {
-    let state = INPUT_TERMINAL_STATE
-        .lock()
-        .expect("input terminal state mutex poisoned")
-        .take();
-    if let Some(state) = state {
-        if state.termios_changed {
-            let _ = rustix::termios::tcsetattr(
-                &state.fd,
-                rustix::termios::OptionalActions::Flush,
-                &state.original_termios,
-            );
-        }
-        let _ = rustix::fs::fcntl_setfl(&state.fd, state.original_flags);
-    }
-}
-
 fn helper_program(program: &str, context: &SecretContext) -> OsString {
     let path = Path::new(program);
     if path.components().next().is_some() && program.contains('/') {
@@ -754,29 +617,14 @@ fn helper_program(program: &str, context: &SecretContext) -> OsString {
     }
 }
 
-fn normalize_secret(
-    name: &str,
-    mut bytes: Zeroizing<Vec<u8>>,
-) -> Result<OwnedSecret, SecretFailure> {
-    if bytes.ends_with(b"\r\n") {
-        let len = bytes.len();
-        bytes.truncate(len - 2);
-    } else if bytes.ends_with(b"\n") {
-        let len = bytes.len();
-        bytes.truncate(len - 1);
-    }
-    if bytes.is_empty() || bytes.contains(&0) || bytes.len() > MAX_SECRET_BYTES {
-        return Err(provider_failure(
-            name,
-            "provider returned unusable secret bytes",
-        ));
-    }
-    std::str::from_utf8(&bytes)
-        .map_err(|_| provider_failure(name, "provider returned non-UTF-8 secret bytes"))?;
-    Ok(OwnedSecret::from_zeroizing(Zeroizing::new(
-        String::from_utf8(std::mem::take(&mut *bytes))
-            .expect("secret bytes were validated as UTF-8"),
-    )))
+fn normalize_secret(name: &str, bytes: Zeroizing<Vec<u8>>) -> Result<OwnedSecret, SecretFailure> {
+    broil_core::secret::normalize_secret(bytes).map_err(|error| {
+        let detail = match error {
+            SecretNormalizationError::UnusableBytes => "provider returned unusable secret bytes",
+            SecretNormalizationError::InvalidUtf8 => "provider returned non-UTF-8 secret bytes",
+        };
+        provider_failure(name, detail)
+    })
 }
 
 fn provider_failure(name: &str, detail: &str) -> SecretFailure {
@@ -799,27 +647,6 @@ fn cancelled_provider(name: &str) -> SecretFailure {
         FailureClass::Cancellation,
         format!("secret provider {name} was cancelled"),
     )
-}
-
-pub fn normalize_path(base: &Path, path: &Path) -> PathBuf {
-    let joined = if path.is_absolute() {
-        path.to_path_buf()
-    } else {
-        base.join(path)
-    };
-    let mut normalized = PathBuf::new();
-    for component in joined.components() {
-        match component {
-            Component::RootDir => normalized.push(Path::new("/")),
-            Component::CurDir => {}
-            Component::ParentDir => {
-                normalized.pop();
-            }
-            Component::Normal(part) => normalized.push(part),
-            Component::Prefix(prefix) => normalized.push(prefix.as_os_str()),
-        }
-    }
-    normalized
 }
 
 impl From<CapabilityError> for SecretFailure {

@@ -1,0 +1,13 @@
+FROM docker.io/library/rust:1.87.0-bookworm
+
+LABEL org.opencontainers.image.title="Broil release builder"
+LABEL org.opencontainers.image.description="Local Broil release builder for x86_64-unknown-linux-gnu"
+LABEL org.broil.release.targets="x86_64-unknown-linux-gnu"
+
+ENV CARGO_INCREMENTAL=0
+ENV CARGO_TERM_COLOR=never
+ENV RUST_BACKTRACE=0
+
+WORKDIR /workspace
+
+RUN rustc --version --verbose && cargo --version --verbose

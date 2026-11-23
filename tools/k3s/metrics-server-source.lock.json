@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "status": "unadopted-build-candidate",
+  "platform": "linux/amd64",
+  "derived_build_version": "0.9.0+broil.go1271.text039",
+  "source": {
+    "repository": "kubernetes-sigs/metrics-server",
+    "tag": "v0.9.0",
+    "source_commit": "2a7c4b2c7d46552ff47f4aeaa3a735c582587ecd",
+    "source_url": "https://codeload.github.com/kubernetes-sigs/metrics-server/tar.gz/2a7c4b2c7d46552ff47f4aeaa3a735c582587ecd",
+    "source_sha256": "7c3dc479484fca306297221058bf55f5d4620305b4041e729dfb497386a621fa",
+    "source_size": 142334,
+    "files": {
+      "Dockerfile": {
+        "sha256": "2165b60403d5e0b9d473aec37ff58c07f6aa1d47e7684047a495a4d72a3de83a",
+        "size": 515
+      },
+      "LICENSE": {
+        "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "size": 11357
+      },
+      "Makefile": {
+        "sha256": "9fb801ab33ad38b5b6696cb193288a2a789c6fd2d9afbfaf55a5a2e6a5d7e851",
+        "size": 9372
+      },
+      "cmd/metrics-server/app/options/kubelet_client.go": {
+        "sha256": "af88507335587ae6c615e96656f187ebc775e6c76a272b7a519777cb75c60616",
+        "size": 6937
+      },
+      "cmd/metrics-server/app/options/kubelet_client_test.go": {
+        "sha256": "a56d9088260bb4c73e065d5c367a206657c3d980d9a59908991027fc2fbe2c2f",
+        "size": 7659
+      },
+      "cmd/metrics-server/app/options/options.go": {
+        "sha256": "3f3c213f5d567262f742c03e248c09c1d06a830549c3915430fc1b5fa006f9c7",
+        "size": 8151
+      },
+      "cmd/metrics-server/app/options/options_test.go": {
+        "sha256": "2522f1531f7cb37c20adbbbaefac41b04297c18bf24306e98ef8f6954a2ca435",
+        "size": 1690
+      },
+      "cmd/metrics-server/app/start.go": {
+        "sha256": "ead1202b0f4de077fa46ed494e9eabf6ac80106a106093db673526edcd111e21",
+        "size": 2850
+      },
+      "go.mod": {
+        "sha256": "498f7e6f71ec46d6a6318663bfcedd7b5044f73f73f669986bc7b0e51e4d3352",
+        "size": 6926
+      },
+      "go.sum": {
+        "sha256": "b3bc5e89d8fe2f5acc706aac417021bc1f22eac3e8fc73f324cef68127efd06a",
+        "size": 42003
+      },
+      "pkg/server/config.go": {
+        "sha256": "b619d933260854988f9e727bcaff9a8125db08f24d2e9a0455a493d40c597aa2",
+        "size": 3709
+      },
+      "pkg/server/health.go": {
+        "sha256": "e45cdbf7c190d655bb0e158fb23aa06cd9bc69da895d2cd604f6b62bb7f937cb",
+        "size": 1958
+      },
+      "pkg/server/informer.go": {
+        "sha256": "daee6ca104e2f1509115711afa446f0849c75ac648b8a4e4ac6962cb206d3b07",
+        "size": 1840
+      },
+      "pkg/server/metrics.go": {
+        "sha256": "d062af2a1045bdec531452d3b2d89915f54d6a8a5a835d5dbafd496eaa4e6b23",
+        "size": 1522
+      },
+      "pkg/server/server.go": {
+        "sha256": "1f86cda268679bb7f48e97bd097fa0dec0c83ba71316ff5c0fb88224babf493f",
+        "size": 6230
+      },
+      "pkg/server/server_test.go": {
+        "sha256": "898f44440be693224e58e5aea463df40cd1a3f0259c7eb06110af66f613ba416",
+        "size": 3517
+      }
+    }
+  },
+  "go": {
+    "version": "1.27.1",
+    "source_commit": "862c888e612ac346c7c4d99c9392bdfd265f33b0",
+    "url": "https://go.dev/dl/go1.27.1.linux-amd64.tar.gz",
+    "sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+    "source_url": "https://go.dev/dl/go1.27.1.src.tar.gz",
+    "source_sha256": "4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1"
+  },
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOSUMDB": "off",
+    "GOPROXY": "off",
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOOS": "linux",
+    "GOARCH": "amd64",
+    "GOFLAGS": "-mod=readonly",
+    "GOMAXPROCS": "2"
+  },
+  "qualification": "Unchanged upstream application with the exact reviewed normalization module overlay and compiler; graph, source/image, advisory, legal, custody and API/TLS behavior remain adoption gates.",
+  "build_command": [
+    "go",
+    "build",
+    "-mod=readonly",
+    "-trimpath",
+    "-buildvcs=false",
+    "-ldflags=-buildid= -X k8s.io/client-go/pkg/version.gitVersion=v0.9.0+broil.go1271.text039 -X k8s.io/client-go/pkg/version.gitCommit=2a7c4b2c7d46552ff47f4aeaa3a735c582587ecd",
+    "-o",
+    "{output}",
+    "./cmd/metrics-server"
+  ],
+  "overlay": {
+    "file": "metrics-server-module-overlay.lock.json",
+    "sha256": "578f16a01ac587698276062c15760735cadbb80e5d3cb7859f28c91c57dd8fbf"
+  }
+}

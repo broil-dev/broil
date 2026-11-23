@@ -6,6 +6,8 @@
 mod discovery;
 mod extends;
 mod fragments;
+pub mod images;
+pub mod k3s;
 mod raw;
 mod remote;
 mod validate;
@@ -69,3 +71,5 @@ pub fn load(mode: &LoadMode) -> Result<LoadedProject, ConfigError> {
         config,
     })
 }
+
+mod secrets;

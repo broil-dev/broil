@@ -6,6 +6,8 @@ CLAUDE.md
 
 # Rust
 /target
+/packaging/out/
+/packaging/work/
 
 # Python
 __pycache__/

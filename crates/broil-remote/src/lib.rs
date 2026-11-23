@@ -9,7 +9,7 @@ pub mod check;
 pub mod exec;
 mod jobs;
 pub mod known_hosts;
-pub mod path_safety;
+pub use broil_core::secret::path_safety;
 pub mod provision;
 pub mod scheduler;
 pub mod secret;

@@ -455,9 +455,12 @@ fn timeouts(value: &RawValue, path: &str) -> Result<Timeouts, ConfigError> {
 }
 
 fn secret_provider(value: &RawValue, path: &str) -> Result<SecretProvider, ConfigError> {
-    let fields = map_fields(value, path, &["prompt", "file", "helper"])?;
+    let fields = map_fields(value, path, &["prompt", "file", "helper", "store"])?;
     if fields.len() != 1 {
-        return Err(invalid(path, "exactly one of prompt, file, or helper"));
+        return Err(invalid(
+            path,
+            "exactly one of prompt, file, helper, or store",
+        ));
     }
     if let Some(value) = fields.get("prompt") {
         let prompt = map_fields(value, &format!("{path}.prompt"), &["label"])?;
@@ -470,6 +473,25 @@ fn secret_provider(value: &RawValue, path: &str) -> Result<SecretProvider, Confi
         return Ok(SecretProvider::File {
             path: required_string(&file, "path", &format!("{path}.file"))?,
         });
+    }
+    if let Some(value) = fields.get("store") {
+        let store_path = format!("{path}.store");
+        let fields = map_fields(value, &store_path, &["key", "set"])?;
+        let key = required_string(&fields, "key", &store_path)?;
+        let set = optional_string(&fields, "set", &store_path)?;
+        if !broil_core::secrets::valid_key(&key) {
+            return Err(invalid(&format!("{store_path}.key"), "a user key"));
+        }
+        if set
+            .as_deref()
+            .is_some_and(|id| !broil_core::secrets::valid_set(id, true))
+        {
+            return Err(invalid(
+                &format!("{store_path}.set"),
+                "a qualified store-relative set",
+            ));
+        }
+        return Ok(SecretProvider::Store { key, set });
     }
     let helper_path = format!("{path}.helper");
     let helper = map_fields(fields["helper"], &helper_path, &["command"])?;

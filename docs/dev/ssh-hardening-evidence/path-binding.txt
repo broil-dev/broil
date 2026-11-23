@@ -1,4 +1,0 @@
-package=russh 0.62.5
-package_id=path+file://$COMMITTED_VENDOR#russh@0.62.5
-source=null
-source_path=$COMMITTED_VENDOR

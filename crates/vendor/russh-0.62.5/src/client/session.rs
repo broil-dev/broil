@@ -1,3 +1,4 @@
+// Modified by the Broil project from russh 0.62.5; see LICENSE.txt and docs/provenance/russh-0.62.5.md for provenance.
 use log::error;
 use ssh_encoding::Encode;
 use tokio::sync::oneshot;
@@ -18,10 +19,9 @@ impl Session {
         let result = if let Some(ref mut enc) = self.common.encrypted {
             match enc.state {
                 EncryptedState::Authenticated => {
-                    let sender_channel = enc.new_channel(
-                        self.common.config.window_size,
-                        self.common.config.maximum_packet_size,
-                    );
+                    let window = if self.private.is_some() { 65_536 } else { self.common.config.window_size };
+                    let maximum = if self.private.is_some() { 32_768 } else { self.common.config.maximum_packet_size };
+                    let sender_channel = enc.new_channel(window, maximum);
                     push_packet!(enc.write, {
                         msg::CHANNEL_OPEN.encode(&mut enc.write)?;
                         kind.encode(&mut enc.write)?;
@@ -30,18 +30,10 @@ impl Session {
                         sender_channel.encode(&mut enc.write)?;
 
                         // window.
-                        self.common
-                            .config
-                            .as_ref()
-                            .window_size
-                            .encode(&mut enc.write)?;
+                        window.encode(&mut enc.write)?;
 
                         // max packet size.
-                        self.common
-                            .config
-                            .as_ref()
-                            .maximum_packet_size
-                            .encode(&mut enc.write)?;
+                        maximum.encode(&mut enc.write)?;
 
                         write_suffix(&mut enc.write)?;
                     });

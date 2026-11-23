@@ -1,0 +1,139 @@
+{
+  "controller": "linux/amd64",
+  "filesystem_helper": {
+    "build_flags": "--release --target x86_64-unknown-linux-gnu; source=/broil; cargo-source=/cargo; linker-build-id=none",
+    "build_script": "tools/image-client/build-worker.sh",
+    "capabilities": [
+      "prepare",
+      "prepare-slot",
+      "copy-tool",
+      "inspect-prepared",
+      "verify-staged",
+      "verify-produced",
+      "cleanup"
+    ],
+    "compiler": [
+      "rustc 1.92.0 (ded5c06cf 2025-12-08)",
+      "binary: rustc",
+      "commit-hash: ded5c06cf21d2b93bffd5d884aa6e96934ee4234",
+      "commit-date: 2025-12-08",
+      "host: x86_64-unknown-linux-gnu",
+      "release: 1.92.0",
+      "LLVM version: 21.1.3"
+    ],
+    "legal_notice_sha256": "04b00a8df554b32ec62a8c8822d761408dd1ad6556c825569f4485f6a691c727",
+    "linker_runtime": {
+      "cc": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+      "ld": "GNU ld (GNU Binutils for Ubuntu) 2.42",
+      "ldd": "ldd (Ubuntu GLIBC 2.39-0ubuntu8.3) 2.39"
+    },
+    "normal_closure_sha256": "d12aa52b3ab5dda10cbb444a5241445fce48ac428e8cfd9fa4ad89576b88f3b2",
+    "protocol_version": 3,
+    "sha256": "c978ef7ded1c1f57721973ff0a5f5ef3a7ea1d019649f308e2a82edcda5ced4b",
+    "size": 880000,
+    "source_inputs": {
+      "Cargo.lock": "906340dd10711ff5d1e8d5e8e69486d939009aed2912f5e188a01ffab00d0345",
+      "Cargo.toml": "ca3fb8d33f456469ab5a20c7a485fbcd2c1f4b2ae865925b92a12fb873968958",
+      "crates/broil-command/Cargo.toml": "aaeb341bb1c9afecbfe63170784672afb322f5afbe1d467a9f052003d156813a",
+      "crates/broil-command/src/image_client_worker.rs": "a970406e10cdc95e9ad1cb45746b3198d3d6ca61724c436553df08647e92b38a",
+      "crates/broil-command/src/images/buffer.rs": "835eafc9d96f3667f0af35b9005e30342955d58c47c7abe398eb43f666c5bbc3",
+      "crates/broil-command/src/images/common.rs": "c162157526376870f812546a8cbab55d85d2f0126cc2605e8eda9544ee1aae4c",
+      "crates/broil-command/src/images/content.rs": "dbda94bac68091225afc8b92b4c472729b49e287e52f4b06a0243f7718678f9d",
+      "crates/broil-command/src/images/files.rs": "4e86ac6fefaaa287d789139975428cc35928457d3370b3f0a4f13478a3c208a6",
+      "crates/broil-command/src/images/json.rs": "8c1e3fe28cb652ce97b5e5f5d82c55d6ff33ecca71281f2a7caf52294d2b2554",
+      "crates/broil-command/src/images/tool_policy.rs": "3b50e25d85c0afe5a591e6a0bd0f3b9425872266d9e30f91777792bf1bb9e5d7",
+      "crates/broil-command/src/images/worker.rs": "ae728c646450110f646904bacaf473a6eb5cff0b9642301471d66ee80517bead",
+      "crates/broil-core/Cargo.toml": "e5e470ac3f9096c36715dc34c31f76002d6fc3ffb4b0a6c19f803e2dcf9ffdd1",
+      "crates/broil-core/src/applications.rs": "89f91d3c6331a8de368743ad2ab229ef24a93832d0184ed614056c8368b6071d",
+      "crates/broil-core/src/error.rs": "9b7d8cb060284a5cfe53b456c8fd10b21576705ee8deb159786703a2273c0b0b",
+      "crates/broil-core/src/images.rs": "d99de52e3a18903e857842e28c3afd956fdba939ec2f63c03e4e65ef57a34308",
+      "crates/broil-core/src/images/reference.rs": "39abb98976ddf27b55bec7733e5f11cbdd5cae03ceec299fc44fc4e01f453e0d",
+      "crates/broil-core/src/k3s.rs": "5aa84af291a97ca95364ace97b9d396578b165f99a0afbdd05d1559922b3bbd2",
+      "crates/broil-core/src/lib.rs": "c5e392debb2fd9398f3e7ec993e83ff11c1cebc59b056e057d426bb3e89b5913",
+      "crates/broil-core/src/model.rs": "040e3648dcd95392f600f4ec27be1d281b765f7363c6a48aaf58ab665e1c21a2",
+      "crates/broil-core/src/remote.rs": "47e2a579551dd51246eea010fc75fb184f2f64aa7bfb71827aad27b3dd43208b",
+      "crates/broil-core/src/secret.rs": "98b1b64806a493c2e71649a802ac7f578c3d7091b26fea59530c468239123646",
+      "crates/broil-core/src/secret/environment.rs": "163a9ea143969316a2978480c4859228041dba4239b4d846d5139b6a2fbe2626",
+      "crates/broil-core/src/secret/path_safety.rs": "718822d7b6b424220db64a732c0ddd85cc2113ff4825a4a47c6bb27d41e1ed74",
+      "crates/broil-core/src/secrets.rs": "c929f90d2fd4ec3478e030676730cdd26d0f7492104020bc02184b687c088273",
+      "crates/broil-core/src/segment.rs": "c19a553e5c7cf419e03c6bb477d3719f6356fafeb5b9bf8edc08bc37c461368b",
+      "crates/broil-core/src/tokens.rs": "b2aa9d872ad1ce976fde94f3374a36ef0f622f1f98c1c48596fe26aa1680c844",
+      "tools/image-client/build-worker.sh": "8b5c838ce5c3f95af46d720741679cf8a5d46074209bd7092104336c10e6e6ca",
+      "tools/image-client/public-tools.json": "efac71d8449c4400288c44fd594991e35a2a09e82a6a30c348fa51ae89328dee"
+    },
+    "target": "x86_64-unknown-linux-gnu"
+  },
+  "frontend": {
+    "config": {
+      "digest": "sha256:7b1f115048803b89291c08409139f1390862db2244afc3f74e634bbbbe78129c",
+      "mediaType": "application/vnd.oci.image.config.v1+json",
+      "size": 1327
+    },
+    "index_digest": "sha256:dabfc0969b935b2080555ace70ee69a5261af8a8f1b4df97b9e7fbcf6722eddf",
+    "layers": [
+      {
+        "digest": "sha256:981cf2e35385187cc01dcd144cd31e3ce126a4fffcb9ac2c0b7f43280ecff33c",
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "size": 14122468
+      }
+    ],
+    "manifest": {
+      "digest": "sha256:6ce6616ec35021075551c55e604374e8b47a66d157bc55ec2f2d2326450a9ae1",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "size": 850
+    },
+    "source_commit": "b772c318368090fb2ffc9c0fed92e0a35bf82389",
+    "version": "1.18.0"
+  },
+  "public_tool_input": "public-tools.json",
+  "public_tool_input_sha256": "efac71d8449c4400288c44fd594991e35a2a09e82a6a30c348fa51ae89328dee",
+  "schema": 1,
+  "tools": {
+    "buildctl": {
+      "archive_sha256": "af8064eca16077b4d6937745988ba2d2dfa439540874cdcd918318315f3ba1d3",
+      "member": "bin/buildctl",
+      "sha256": "89b7236ef320133478117a21e80b265abf59aadbeb3cc22f14bacb43ca75b3ac",
+      "size": 33536339,
+      "source_commit": "b772c318368090fb2ffc9c0fed92e0a35bf82389",
+      "url": "https://github.com/moby/buildkit/releases/download/v0.24.0/buildkit-v0.24.0.linux-amd64.tar.gz",
+      "version": "0.24.0"
+    },
+    "buildx": {
+      "archive_sha256": "4104d79a791a8744c0b43fd5bd0a6172dff29040c5229946a1cdb2d27b0b5bfa",
+      "sha256": "4104d79a791a8744c0b43fd5bd0a6172dff29040c5229946a1cdb2d27b0b5bfa",
+      "size": 66949304,
+      "source_commit": "faaea65da4ba0e58a13cd9cadcb950c51cf3b3c9",
+      "url": "https://github.com/docker/buildx/releases/download/v0.25.0/buildx-v0.25.0.linux-amd64",
+      "version": "0.25.0"
+    },
+    "docker": {
+      "archive_sha256": "53dc06dc3f775282ddff93b2d0974bbe6480761018c61e7a797342a9c7f14e23",
+      "member": "docker/docker",
+      "sha256": "dc43af5e47704ae0c87474731d9b15bea859bffd28c48ed04785642f0ce67b9e",
+      "size": 42791888,
+      "source_commit": "e6534b4eb700e592f25e7213568a02f3ce37460d",
+      "url": "https://download.docker.com/linux/static/stable/x86_64/docker-28.2.2.tgz",
+      "version": "28.2.2"
+    },
+    "registry": {
+      "sha256": "5813c491de1c9bd83f16d7151426bbe6d7b2bc7b4cb5defc7acdee20ea76a9e6",
+      "size": 10489777,
+      "source_inputs": {
+        "tools/image-registry/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "tools/image-registry/README.md": "fd1d9ec2c82b33bac58df9cbc2d8a7702c5ffd51d9906b0f986cd9b00b7f4324",
+        "tools/image-registry/content.go": "13ebf2f99c2a50a7bcfdd94754203b2489a0ed1a8dfde17fb0bd57e2c0723241",
+        "tools/image-registry/go.mod": "9eb0c9974c0f128445f72864c92591dd8b8300fb18da7d35d7f9b93fe295f2f6",
+        "tools/image-registry/http.go": "31e11c15de12a509a0d7df2d16606aa037f09635c19cba347fc5eca0954bac7d",
+        "tools/image-registry/legal/LICENSE-911f8f578293.txt": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+        "tools/image-registry/legal/PATENTS-96f408bfae65.txt": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+        "tools/image-registry/legal/standard-library-notices.txt": "b8c44572e2b8dcc8a9d9c43eb9792cbd04e9d1fe593703d37d7c112f2839af7b",
+        "tools/image-registry/main.go": "f0aeca2468917449a7ec667201799db3d7cabe1646cd20e9c4971de37d7c9a04",
+        "tools/image-registry/policy.go": "5528a16d3ec20ada39361db4905af1cf7be3d8cd20bffbe320c0c22c8201922f",
+        "tools/image-registry/storage_linux.go": "bc83621506ee266a1d6d8ab4a69182f4626e30c9d7b189edc0ee1287c4eb9e03",
+        "tools/image-registry/toolchain.lock.json": "1fe2dc0941576bf90e408e735a797aa7d50cef2b1a7af424f900a50655f6ba27"
+      },
+      "toolchain": "../image-registry/toolchain.lock.json",
+      "version": "protocol-1-cache-miss"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "status": "unadopted-replication-candidate",
+  "version": "v2.1.7",
+  "platform": "linux/amd64",
+  "archive": "syncthing-linux-amd64-v2.1.7.tar.gz",
+  "url": "https://github.com/syncthing/syncthing/releases/download/v2.1.7/syncthing-linux-amd64-v2.1.7.tar.gz",
+  "size": 14046697,
+  "archive_sha256": "2edc416e7ed136b7c858ed5f3f02a3b8316589605e54c380228ceea7acbf0142",
+  "checksums": {
+    "url": "https://github.com/syncthing/syncthing/releases/download/v2.1.7/sha256sum.txt.asc",
+    "signer": "FBA2E162F2F44657B38F0309E5665F9BD5970C47"
+  },
+  "executable": "syncthing-linux-amd64-v2.1.7/syncthing",
+  "executable_size": 34022872,
+  "sha256": "f5c12679f2bad1b5eff619ba7b04ead1a457e439a1e55dc640d4d8995d7f4dbd"
+}

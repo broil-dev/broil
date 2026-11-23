@@ -41,3 +41,7 @@ not index sequences.
 
 `get cfg` reads the normalized config. It does not apply an execution
 environment overlay after dispatch.
+
+Image, builder, and registry declarations are available through `images`,
+`builders`, and `registries`. See [image catalogs](image-catalog.md) for examples
+and the distinction between declared and effective values.

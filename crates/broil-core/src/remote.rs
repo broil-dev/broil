@@ -1,8 +1,12 @@
 // Copyright 2026 Broil contributors
 // SPDX-License-Identifier: Apache-2.0
+//! Typed remote configuration shared by validation, inventory resolution,
+//! and command presentation.
 
 use std::collections::BTreeMap;
 
+/// A field that can inherit, explicitly select a value, or explicitly
+/// clear an inherited nullable value.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum Setting<T> {
     #[default]
@@ -68,6 +72,7 @@ pub enum SecretProvider {
     Prompt { label: String },
     File { path: String },
     Helper { command: Vec<String> },
+    Store { key: String, set: Option<String> },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

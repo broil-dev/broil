@@ -11,5 +11,6 @@ broil-config = { path = "../broil-config" }
 broil-core = { path = "../broil-core" }
 
 [dev-dependencies]
+broil-secrets = { path = "../broil-secrets" }
 serde_json.workspace = true
 tempfile.workspace = true

@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "status": "unadopted-build-candidate",
+  "platform": "linux/amd64",
+  "source": {
+    "repository": "distribution/distribution",
+    "tag": "v3.1.1",
+    "source_commit": "9a8d98b679740cd514aa7e7d84d23d442a5ef54c",
+    "source_url": "https://codeload.github.com/distribution/distribution/tar.gz/9a8d98b679740cd514aa7e7d84d23d442a5ef54c",
+    "source_sha256": "db8d38f341b7699e516eaa33986814cce3276e75d1df4ac6f77d60e58c688c45",
+    "source_size": 14399469,
+    "files": {
+      "go.mod": {
+        "sha256": "c95fafbcabeef10e02f32f5b0863c943b585f34d9156a4a0e28e610a00fc44b1",
+        "size": 6496
+      },
+      "go.sum": {
+        "sha256": "f09e7c1be5ffe27cec16d932185757683e5323cca8a99da6a15f89c3f4437198",
+        "size": 42691
+      },
+      "LICENSE": {
+        "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14",
+        "size": 11325
+      },
+      "Dockerfile": {
+        "sha256": "cacbc00b33bbc30ce37c452fc38cd1c5c1eaf9e7eb76675036a0bddea55f2297",
+        "size": 2934
+      },
+      "cmd/registry/main.go": {
+        "sha256": "8dbb306121371e311ad5521c869a7d96367fe04401a33351fad092a207546d63",
+        "size": 1249
+      },
+      "registry/auth/token/token.go": {
+        "sha256": "f0a0ec0250d67a74aafa1c144060e8b1675d4e6b676efdd09f631192499d2715",
+        "size": 8821
+      },
+      "registry/auth/token/accesscontroller.go": {
+        "sha256": "7b672caccb1b1c9e5c89e9a0f57818609be13f8e7990ae0be1b50e92a346a593",
+        "size": 11949
+      },
+      "registry/handlers/app.go": {
+        "sha256": "aeeab9e34f541805b6c0ca1b6234626f893f01605f52164a90d51724c363e340",
+        "size": 40226
+      }
+    }
+  },
+  "go": {
+    "version": "1.27.1",
+    "source_commit": "862c888e612ac346c7c4d99c9392bdfd265f33b0",
+    "url": "https://go.dev/dl/go1.27.1.linux-amd64.tar.gz",
+    "sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+    "source_url": "https://go.dev/dl/go1.27.1.src.tar.gz",
+    "source_sha256": "4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1"
+  },
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOSUMDB": "off",
+    "GOPROXY": "off",
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOOS": "linux",
+    "GOARCH": "amd64",
+    "GOFLAGS": "-mod=readonly"
+  },
+  "qualification": "Broil-built derivative candidate with exact three-module overlay; advisory/legal/image and runtime qualification required before use.",
+  "overlay": {
+    "file": "distribution-module-overlay.lock.json",
+    "sha256": "b576fdefbe74dfab84651ae4fab1779b44e576a4d27fd8b5b181ec554251dc34"
+  },
+  "build_command": [
+    "go",
+    "build",
+    "-mod=readonly",
+    "-trimpath",
+    "-buildvcs=false",
+    "-ldflags=-buildid= -X github.com/distribution/distribution/v3/version.version=3.1.1+broil.otel144 -X github.com/distribution/distribution/v3/version.revision=9a8d98b679740cd514aa7e7d84d23d442a5ef54c -X github.com/distribution/distribution/v3/version.mainpkg=github.com/distribution/distribution/v3",
+    "-o",
+    "{output}",
+    "./cmd/registry"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "status": "unadopted-encryption-candidate",
+  "version": "v1.3.2",
+  "platform": "linux/amd64",
+  "source_commit": "b74dce4cdbe35b5e5f66c06d9612b72f89028758",
+  "archive": {
+    "url": "https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-amd64.tar.gz",
+    "size": 19405817,
+    "sha256": "cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10"
+  },
+  "files": {
+    "age/age-keygen": {
+      "size": 4051278,
+      "sha256": "0a0009db842259d6717f7eeb30acb6b90d2a2eb924c6acd0a0db0ca1f1537899"
+    },
+    "age/age-plugin-tag": {
+      "size": 4276743,
+      "sha256": "7019766fc88e893af6fa2db571863c9182e49f5be5d673c42f41ef1853d8d9aa"
+    },
+    "age/age-plugin-batchpass": {
+      "size": 4224528,
+      "sha256": "2d353ec439cabce78d201b50b9eefc5028dbfa0791f4c5592e85c9d1dd3e2e65"
+    },
+    "age/age-plugin-pq": {
+      "size": 4339590,
+      "sha256": "d3d1025b451af0d43a2db8b33c1ad130e9cb4f33d3417c90368b5bff224258ee"
+    },
+    "age/age-plugin-tagpq": {
+      "size": 4291077,
+      "sha256": "0f26e48e4e0ff8a91d121e2f3ae437d230e04b8eb08a73cf84fd3cf92a4846bf"
+    },
+    "age/age": {
+      "size": 6977014,
+      "sha256": "eb7dd1b518f0a307c99cd97782623c5321da049154b04acd2d98d21aa7bc9b2c"
+    },
+    "age/LICENSE": {
+      "size": 2975,
+      "sha256": "afbdb4e07a359499db587ae632815809b1fc1670a92d5449af112ce9a67833a2"
+    },
+    "age/age-inspect": {
+      "size": 4511789,
+      "sha256": "b05fd11b3cb31ae4789749e458cd963279215a73b133ff8ffdaa6f2604918f65"
+    }
+  },
+  "qualification": "Official archive/member identity only; legal, custody, CI encryption, off-node transfer and actual restore evidence remain required."
+}

@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "status": "unadopted-build-candidate",
+  "platform": "linux/amd64",
+  "source": {
+    "source_commit": "c67e1750ff5edd3fb3f844674c4adfd30c31ebb6",
+    "source_url": "https://codeload.github.com/cesanta/docker_auth/tar.gz/c67e1750ff5edd3fb3f844674c4adfd30c31ebb6",
+    "source_sha256": "271cbf93abd646789d4f1cbaa419d642a9d2002caf845914f5f6f456cc59fde1",
+    "source_size": 150215,
+    "files": {
+      "auth_server/go.mod": {
+        "sha256": "9b6f71f73b0ade01b89876bf751215a56d71e01a660c880e166f1c2e43f760c9",
+        "size": 3590
+      },
+      "auth_server/go.sum": {
+        "sha256": "eff8fabf6a6934083cb3b6a43678f7bd3922811fe8d4f622e9befbf41282a349",
+        "size": 83015
+      },
+      "auth_server/main.go": {
+        "sha256": "3a7bbb05fa164986afd6f204236c90f53eb11d64a1e641693aa2ed77391eeb10",
+        "size": 6923
+      },
+      "auth_server/server/server.go": {
+        "sha256": "a9e140277ead57e8a9ea382dc1a21313c53dc6b2cc04661dcf52a5b69f6f5f0f",
+        "size": 15374
+      },
+      "auth_server/server/config.go": {
+        "sha256": "f4c675d1838493a58901574b59032cef7d92a386e664844fd3e138d0891b5162",
+        "size": 18802
+      },
+      "LICENSE": {
+        "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+        "size": 10173
+      }
+    }
+  },
+  "go": {
+    "version": "1.27.1",
+    "source_commit": "862c888e612ac346c7c4d99c9392bdfd265f33b0",
+    "url": "https://go.dev/dl/go1.27.1.linux-amd64.tar.gz",
+    "sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+    "source_url": "https://go.dev/dl/go1.27.1.src.tar.gz",
+    "source_sha256": "4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1"
+  },
+  "build_flags": [
+    "-trimpath",
+    "-buildvcs=false",
+    "-ldflags=-buildid="
+  ],
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOSUMDB": "off",
+    "GOPROXY": "off",
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOOS": "linux",
+    "GOARCH": "amd64"
+  },
+  "qualification": "Build preflight only. Full verified module/legal closure, advisory, image and runtime evidence are required before use."
+}

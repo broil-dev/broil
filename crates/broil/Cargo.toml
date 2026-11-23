@@ -5,10 +5,15 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
+[features]
+vault-live = []
+
 [dependencies]
 broil-cli = { path = "../broil-cli" }
 
 [dev-dependencies]
+broil-core = { path = "../broil-core" }
+broil-secrets = { path = "../broil-secrets" }
 rexpect = "0.6"
 serde_json.workspace = true
 tempfile.workspace = true

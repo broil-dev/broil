@@ -33,6 +33,9 @@ use crate::{
     EffectiveInventory, EffectiveMachine, EffectiveTimeouts, FailureClass, HostKey, JumpScope,
 };
 
+#[path = "private_exec.rs"]
+pub mod private;
+
 const CANCEL_CLEANUP_TIMEOUT: Duration = Duration::from_secs(2);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -467,6 +470,43 @@ pub struct PrivilegeContext {
 }
 
 impl PrivilegeContext {
+    pub fn with_store_context(mut self, store: crate::secret::StoreContext) -> Self {
+        if self.privilege_profiles.values().any(|profile| {
+            profile
+                .password
+                .as_ref()
+                .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+        }) {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_store_context_for_profiles(
+        mut self,
+        store: crate::secret::StoreContext,
+        profiles: &[&str],
+    ) -> Self {
+        if profiles
+            .iter()
+            .filter_map(|name| self.privilege_profiles.get(*name))
+            .any(|profile| {
+                profile
+                    .password
+                    .as_ref()
+                    .is_some_and(|secret| self.secret_context.is_store_provider(&secret.secret))
+            })
+        {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_non_interactive(mut self, non_interactive: bool) -> Self {
+        self.secret_context = self.secret_context.with_non_interactive(non_interactive);
+        self
+    }
+
     pub fn from_project(
         project: &LoadedProject,
         environment: &str,
@@ -618,6 +658,32 @@ async fn run_async<B: ExecBackend>(
         duration_millis: now_millis().saturating_sub(started),
         results,
     })
+}
+
+pub async fn run_argv(
+    root: &Path,
+    inventory: &EffectiveInventory,
+    machine: &EffectiveMachine,
+    argv: Vec<Vec<u8>>,
+    backend: RusshExecBackend,
+    timeout_seconds: u64,
+    cancel: CancellationToken,
+) -> Result<ExecTargetResult, ExecRunError> {
+    let target = plan_targets(root, inventory, &[machine])?
+        .pop()
+        .ok_or_else(|| ExecRunError::new(FailureClass::Configuration, "no target"))?;
+    let options = TargetExecOptions {
+        command: Arc::new(ExecCommand::Argv(argv)),
+        stdin: StaticStdin::empty(),
+        forward_stdin: false,
+        live_streams: None,
+        pty: false,
+        local_terminal: LocalTerminal::default(),
+        privilege: None,
+        dispatch_timeout_seconds: Some(timeout_seconds),
+        cancel,
+    };
+    Ok(backend.exec_target(target, options).await)
 }
 
 pub fn run_script<B: ExecBackend>(
@@ -1285,6 +1351,15 @@ impl RusshExecBackend {
         target: &ExecTarget,
         options: &TargetExecOptions,
     ) -> Result<client::Handle<StrictHandler>, ExecFailure> {
+        self.connect_bound(target, options, None).await
+    }
+
+    async fn connect_bound(
+        &self,
+        target: &ExecTarget,
+        options: &TargetExecOptions,
+        pins: Option<&private::VerifiedKeys>,
+    ) -> Result<client::Handle<StrictHandler>, ExecFailure> {
         let (endpoint, endpoint_port) = route_endpoint(target);
         let connect_timeout = Duration::from_secs(target.timeouts.connect.seconds);
         let connect_deadline = tokio::time::Instant::now() + connect_timeout;
@@ -1300,8 +1375,10 @@ impl RusshExecBackend {
         .await?;
         let mut session = match &target.route {
             ExecRoute::Direct => {
-                let expected =
-                    self.pinned_key(&target.target_alias, FailureClass::UnknownHostKey)?;
+                let expected = match pins {
+                    Some(pins) => pins.target.clone(),
+                    None => self.pinned_key(&target.target_alias, FailureClass::UnknownHostKey)?,
+                };
                 cancellable(
                     &options.cancel,
                     connect_strict(stream, expected, connect_deadline),
@@ -1310,7 +1387,12 @@ impl RusshExecBackend {
                 .map_err(strict_target_trust_failure)?
             }
             ExecRoute::ViaJump(jump) => {
-                let expected = self.pinned_key(&jump.alias, FailureClass::UnknownHostKey)?;
+                let expected = match pins {
+                    Some(pins) => pins.jump.clone().ok_or_else(|| {
+                        ExecFailure::new(FailureClass::Configuration, "private jump pin is missing")
+                    })?,
+                    None => self.pinned_key(&jump.alias, FailureClass::UnknownHostKey)?,
+                };
                 let mut jump_session = cancellable(
                     &options.cancel,
                     connect_strict(stream, expected, connect_deadline),
@@ -1367,8 +1449,10 @@ impl RusshExecBackend {
                     })
                 })
                 .await?;
-                let expected =
-                    self.pinned_key(&target.target_alias, FailureClass::UnknownHostKey)?;
+                let expected = match pins {
+                    Some(pins) => pins.target.clone(),
+                    None => self.pinned_key(&target.target_alias, FailureClass::UnknownHostKey)?,
+                };
                 cancellable(
                     &options.cancel,
                     connect_strict(channel.into_stream(), expected, connect_deadline),

@@ -1,0 +1,73 @@
+{
+  "activation": "inactive generations only; owning lifecycle phase activates",
+  "auth": {
+    "digest": "b15a78d2bf9007e75f0aab45f540254ce18451289a4868748b599b5175167591",
+    "image": "broil.invalid/candidate/auth"
+  },
+  "bodies": {
+    "cert_manager": "f6e7893a077b973002ceb048cac193bb54b20a090d541856b2621a1318a91968",
+    "control": "283c19d33c5f84df28c4de97ee7aa34fdc3e7083eb128bf95316d0554ae5c175",
+    "delivery": "e511841590e0ef24efcfc95767e85d397cfbebc22ebc1dc0f3cb0680fba7a11a",
+    "ingress": "4b1a361440993b2340b170e83a1975fc86c93ad9e649cabf265069f20dba5224",
+    "lifecycle": "5ab6ede929a97742bfee280ce35015eef6114bd125efc0aa12fda08d9df30e1d",
+    "network": "39cf316e98ec732106366fe15adf0d3212df20bd25160588af08cecda47e8674",
+    "node": "7c848125211cd918577576e52838a19e26a5f7314b01b4115989668730267eab",
+    "registry": "3494364d4d889579b6c1d548f9fa70e97b9d57b70595a5b52d7b7c3839343049",
+    "release": "641842310f32a1f67dd7830fc8f65a2217e407e475e62d3bc39282fdc7b798c6",
+    "service_guard": "5f3354868a84c2332f63cc502f984f8b2ec7cad95cf0b938e626d947c972e11a"
+  },
+  "cert_manager": {
+    "images": {
+      "acmesolver": "dc5c5b8456d1a50af47a240987e85afce352b5c1155a8a4698b7c91eac19f407",
+      "cainjector": "aa2bc58725d92a643f5069dde58abc93b65566ded8951348873ac9ee7efef66c",
+      "controller": "57bb397c639e0e94184ba67848e5dad04284f24645e521e764a0ee5f5002f286",
+      "webhook": "b929259301ee75270ab4651d5e6bd4ba7b6624b1ce48ba767d064295a9312101"
+    },
+    "manifest": "e03b668ec8675214af6b0a671699d088f2601fa3878e0dbe1b41d3feafd1879f",
+    "render": "128cff01c7045fe773965a5e2c98fcd4798056293396b1ddc627392b9bfbf2b8",
+    "version": "v1.21.2"
+  },
+  "consumer_namespaces": {
+    "issuer": "cert-manager",
+    "registry-auth": "broil-registry"
+  },
+  "host": "Ubuntu 24.04/systemd, /usr/bin/python3 stdlib",
+  "ingress_charts": {
+    "traefik": "a9ebcfeecdd5b9f1ffea1167a7ffee69e346cd10864998ce8e44b51c204b7767",
+    "traefik_crd": "cd588985d419ca98f1e529a74a5ef06939795311450e8ec31671d8b1b2c1e93c"
+  },
+  "ingress_images": {
+    "klipper_lb": "910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a",
+    "traefik": "96780238b1bbda5a9bb997f4307ce69e798ad1cf6eb7f2dcc0a440823467d199"
+  },
+  "ingress_templates": {
+    "traefik": "e398aa7f8f6686c480ea666984b55cda9ca7b561dbd5b4308455262533edda17"
+  },
+  "k3s_sha256": "835873f37245fc615f547a2fe2af9402a347875f13fa64a1f136de644955ea3f",
+  "k3s_version": "v1.36.4+k3s1",
+  "network_images": {
+    "coredns": "1ba6f47265602e2e50a9c4669e3a955e4298a0d30dc82f39293d4bf1a851e0ff",
+    "helper": "ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f",
+    "provisioner": "c3f2c60ee2490eb83ac00101d7e239fd8c20a5b8b4038e2dfc36a7e66fe99c08"
+  },
+  "network_templates": {
+    "coredns": "f726a65f4fe05f646a34f09306645545d8d2e70d3c59c32592d97419ad3b8968",
+    "local_storage": "205c88f49b770331799a7d52c73f380a31cea59a5087c9f58179d2265fe93009"
+  },
+  "registry": {
+    "digest": "ac52bec3025b9dc75a26112e076e3e0af646fbb40af67ae9f2fcd6465963b839",
+    "image": "broil.invalid/candidate/distribution",
+    "version": "v3.1.1"
+  },
+  "root": "/var/lib/broil/k3s",
+  "schema": 1,
+  "script_sha256": "283c19d33c5f84df28c4de97ee7aa34fdc3e7083eb128bf95316d0554ae5c175",
+  "secret_name": "broil-input- plus first 40 SHA256 hex characters of canonical [owner,{kind,id,generation}] public JSON (resource UID excluded)",
+  "selection_projection": "canonical UTF-8 JSON of schema,binding,declaration,scripts,registries,secrets,references,profile; binding excludes runtime action/nonce/remaining/slots/selection hash",
+  "syncthing": {
+    "sha256": "f5c12679f2bad1b5eff619ba7b04ead1a457e439a1e55dc640d4d8995d7f4dbd",
+    "version": "v2.1.7"
+  },
+  "token_ca": "sha256 of K3s self-signed CA PEM bytes",
+  "tool": "/usr/local/libexec/broil-k3s"
+}

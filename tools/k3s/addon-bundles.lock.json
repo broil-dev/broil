@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "status": "unadopted-public-input-bundles",
+  "assets": [
+    {
+      "image": "quay.io/jetstack/cert-manager-acmesolver@sha256:dc5c5b8456d1a50af47a240987e85afce352b5c1155a8a4698b7c91eac19f407",
+      "manifest": {
+        "digest": "sha256:dc5c5b8456d1a50af47a240987e85afce352b5c1155a8a4698b7c91eac19f407",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3646
+      },
+      "name": "cert-manager-acmesolver.tar",
+      "sha256": "7ba04982af50c0ea996c6c3c43a74ebd369f6ff19fdd87de6365e8886558abb1",
+      "size": 6635520
+    },
+    {
+      "image": "quay.io/jetstack/cert-manager-cainjector@sha256:aa2bc58725d92a643f5069dde58abc93b65566ded8951348873ac9ee7efef66c",
+      "manifest": {
+        "digest": "sha256:aa2bc58725d92a643f5069dde58abc93b65566ded8951348873ac9ee7efef66c",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3647
+      },
+      "name": "cert-manager-cainjector.tar",
+      "sha256": "40abd6980068c8027790028e2263276cbd6880d96024557b42469019b8a8699d",
+      "size": 12421120
+    },
+    {
+      "image": "quay.io/jetstack/cert-manager-controller@sha256:57bb397c639e0e94184ba67848e5dad04284f24645e521e764a0ee5f5002f286",
+      "manifest": {
+        "digest": "sha256:57bb397c639e0e94184ba67848e5dad04284f24645e521e764a0ee5f5002f286",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3647
+      },
+      "name": "cert-manager-controller.tar",
+      "sha256": "df56767be05c896b9c2a07cc2682db92e43b05df914ff3459abcb51b3b6c07b1",
+      "size": 24913920
+    },
+    {
+      "image": "quay.io/jetstack/cert-manager-startupapicheck@sha256:ed347b0ab607058f139b83f41567109456b9776330b63da8086a120afb7f1729",
+      "manifest": {
+        "digest": "sha256:ed347b0ab607058f139b83f41567109456b9776330b63da8086a120afb7f1729",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3647
+      },
+      "name": "cert-manager-startupapicheck.tar",
+      "sha256": "9518b2e557a0d6b2769e975a78fab172d69a019b32988a67f64c2475da16ebfe",
+      "size": 11540480
+    },
+    {
+      "image": "quay.io/jetstack/cert-manager-webhook@sha256:b929259301ee75270ab4651d5e6bd4ba7b6624b1ce48ba767d064295a9312101",
+      "manifest": {
+        "digest": "sha256:b929259301ee75270ab4651d5e6bd4ba7b6624b1ce48ba767d064295a9312101",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3647
+      },
+      "name": "cert-manager-webhook.tar",
+      "sha256": "764618d8597187bcbfa80592ac2ae00f5a9db66f18e2b4a588f518d84a154a54",
+      "size": 19845120
+    },
+    {
+      "image": "docker.io/coredns/coredns@sha256:2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+      "manifest": {
+        "digest": "sha256:2329f5f0e7e79fbe56dcdf11ecc4337ee2476bb251095bc275fe9461cb88a55b",
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 3023
+      },
+      "name": "coredns.tar",
+      "sha256": "979559494e816823df4cd7ce4a86334d3acbb8e3dbcf8ee6553eb7e6fe863027",
+      "size": 24279040
+    },
+    {
+      "image": "docker.io/library/traefik@sha256:96780238b1bbda5a9bb997f4307ce69e798ad1cf6eb7f2dcc0a440823467d199",
+      "manifest": {
+        "digest": "sha256:96780238b1bbda5a9bb997f4307ce69e798ad1cf6eb7f2dcc0a440823467d199",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "size": 1729
+      },
+      "name": "traefik.tar",
+      "sha256": "7b759dd4a52a766c138b536bb7c2e57b1875326969a19e496a45ef3ee16c98f5",
+      "size": 55214080
+    }
+  ]
+}

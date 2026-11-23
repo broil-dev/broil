@@ -2226,6 +2226,7 @@ where
                 Ok(joined) => GuardOutcome::Expired(Some(join_boundary(joined))),
                 Err(_) => {
                     handle.abort();
+                    child.drain_store_workers();
                     GuardOutcome::Expired(None)
                 }
             }

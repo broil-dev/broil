@@ -7,13 +7,20 @@ members = [
     "crates/broil-config",
     "crates/broil-core",
     "crates/broil-remote",
+    "crates/broil-secrets",
 ]
-exclude = ["crates/vendor/russh-0.62.5"]
+exclude = [
+    "crates/vendor/russh-0.62.5",
+    "crates/vendor/saphyr-parser-0.0.11",
+    "crates/vendor/regex-1.13.1",
+    "crates/vendor/regex-automata-0.4.18",
+    "crates/vendor/regex-syntax-0.8.11",
+]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.87"
 license = "Apache-2.0"
 
 [workspace.dependencies]

@@ -113,6 +113,46 @@ pub enum OpenSshPublicKeyIdentity {
 }
 
 impl AuthContext {
+    pub fn with_store_context(mut self, store: crate::secret::StoreContext) -> Self {
+        let uses_store = self
+            .auth_profiles
+            .values()
+            .any(|profile| match &profile.method {
+                AuthMethod::Password(secret) | AuthMethod::KeyboardInteractive(secret) => {
+                    self.secret_context.is_store_provider(&secret.secret)
+                }
+                AuthMethod::PublicKey { identities } => identities.iter().any(|identity| {
+                    matches!(identity, PublicKeyIdentity::File { passphrase: Some(secret), .. }
+                    if self.secret_context.is_store_provider(&secret.secret))
+                }),
+            });
+        if uses_store {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_store_context_for_profiles(
+        mut self,
+        store: crate::secret::StoreContext,
+        profiles: &[&str],
+    ) -> Self {
+        let used = profiles.iter().filter_map(|name| self.auth_profiles.get(*name)).any(|profile| match &profile.method {
+            AuthMethod::Password(secret) | AuthMethod::KeyboardInteractive(secret) => self.secret_context.is_store_provider(&secret.secret),
+            AuthMethod::PublicKey { identities } => identities.iter().any(|identity| matches!(identity,
+                PublicKeyIdentity::File { passphrase: Some(secret), .. } if self.secret_context.is_store_provider(&secret.secret))),
+        });
+        if used {
+            self.secret_context = self.secret_context.with_store_context(store);
+        }
+        self
+    }
+
+    pub fn with_non_interactive(mut self, non_interactive: bool) -> Self {
+        self.secret_context = self.secret_context.with_non_interactive(non_interactive);
+        self
+    }
+
     pub fn from_project(
         project: &LoadedProject,
         environment: &str,

@@ -10,6 +10,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use broil_config::LoadedProject;
 use broil_core::error::{RemoteError, UsageError};
+use broil_core::secret::environment::{CredentialInputs, ordinary_snapshot};
+use broil_remote::secret::StoreContext;
 use broil_remote::{
     EffectiveMachine, EffectiveNamedScriptAction, EffectivePlan, EffectivePlanAction,
     EffectivePlanStep, EffectiveTimedAction, FailureClass, PlanValidationError,
@@ -481,6 +483,153 @@ impl From<broil_remote::transfer::TransferRunError> for TransferCommandError {
     }
 }
 
+pub(crate) fn builder_transfer(
+    project: &LoadedProject,
+    inventory: &broil_remote::EffectiveInventory,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    request: &CopyToRequest,
+) -> Result<broil_remote::transfer::TransferJob, FailureClass> {
+    let (_, request) = copy_to_transfer_request(
+        project,
+        Some(OsStr::new(&inventory.environment)),
+        cwd,
+        env_snapshot,
+        request,
+    )
+    .map_err(|_| FailureClass::Configuration)?;
+    let mut plan = broil_remote::transfer::plan(&project.broil_root, inventory, &request)
+        .map_err(|_| FailureClass::Configuration)?;
+    if plan.jobs.len() != 1 {
+        return Err(FailureClass::Selector);
+    }
+    Ok(plan.jobs.remove(0))
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn builder_backend(
+    project: &LoadedProject,
+    inventory: &broil_remote::EffectiveInventory,
+    machine: &EffectiveMachine,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    privilege: Option<&str>,
+    non_interactive: bool,
+) -> Result<broil_remote::exec::RusshExecBackend, FailureClass> {
+    let location = resolve_known_hosts_location(
+        &project.broil_root,
+        inventory.known_hosts.as_deref(),
+        cwd,
+        env_snapshot,
+        None,
+    )
+    .map_err(|_| FailureClass::Configuration)?;
+    let store = match location {
+        KnownHostsLocation::Default(home) => {
+            broil_remote::known_hosts::KnownHostsStore::open_default(&home)
+        }
+        KnownHostsLocation::Override(path) => {
+            broil_remote::known_hosts::KnownHostsStore::open_override(&path)
+        }
+    }
+    .map_err(|e| e.class())?;
+    let selected = [machine];
+    let profiles = authentication_profiles(inventory, &selected, false);
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
+    let auth = broil_remote::auth::AuthContext::from_project(
+        project,
+        &inventory.environment,
+        env_snapshot,
+    )
+    .with_store_context_for_profiles(store_context.clone(), &profiles)
+    .with_non_interactive(non_interactive);
+    let privilege = broil_remote::exec::PrivilegeContext::from_project(
+        project,
+        &inventory.environment,
+        env_snapshot,
+    )
+    .with_store_context_for_profiles(store_context, &privilege.into_iter().collect::<Vec<_>>())
+    .with_non_interactive(non_interactive);
+    Ok(broil_remote::exec::RusshExecBackend::new(
+        store, auth, privilege,
+    ))
+}
+
+fn authentication_profiles<'a>(
+    inventory: &'a broil_remote::EffectiveInventory,
+    selected: &[&'a EffectiveMachine],
+    bootstrap: bool,
+) -> Vec<&'a str> {
+    let mut profiles = Vec::new();
+    for machine in selected {
+        profiles.push(machine.canonical_profile.as_str());
+        if bootstrap {
+            profiles.extend(
+                machine
+                    .bootstrap_profiles
+                    .iter()
+                    .map(|p| p.profile.as_str()),
+            );
+        }
+        if let Some(jump) = inventory
+            .jumps
+            .iter()
+            .find(|jump| jump.name == machine.route)
+        {
+            profiles.push(jump.auth_profile.as_str());
+        }
+    }
+    profiles
+}
+
+fn script_consumers<'a>(
+    action: &'a broil_remote::provision::ScriptAction,
+    privilege: &mut Vec<&'a str>,
+    providers: &mut Vec<&'a str>,
+) {
+    privilege.extend(action.privilege.as_deref());
+    if let Some(broil_remote::provision::ScriptStdin::Secret { provider }) = &action.stdin {
+        providers.push(provider);
+    }
+}
+
+fn provision_consumers<'a>(selected: &[&'a EffectiveMachine]) -> (Vec<&'a str>, Vec<&'a str>) {
+    use broil_remote::provision::ProvisionAction;
+    let (mut privilege, mut providers) = (Vec::new(), Vec::new());
+    for &machine in selected {
+        let Ok(Some(plan)) = &machine.plan else {
+            continue;
+        };
+        for action in plan
+            .runtime_transition_actions
+            .iter()
+            .chain(&plan.runtime_security_verifiers)
+        {
+            script_consumers(&action.action, &mut privilege, &mut providers);
+        }
+        for step in &plan.runtime_steps {
+            for action in step.check.iter().chain(&step.verify) {
+                script_consumers(action, &mut privilege, &mut providers);
+            }
+            match &step.run {
+                ProvisionAction::Script(action) => {
+                    script_consumers(action, &mut privilege, &mut providers)
+                }
+                ProvisionAction::CopyTo(action) => privilege.extend(action.privilege.as_deref()),
+                ProvisionAction::Reboot(action) => {
+                    privilege.extend(action.privilege.as_deref());
+                    if let Some(when) = &action.when {
+                        script_consumers(when, &mut privilege, &mut providers);
+                    }
+                }
+                ProvisionAction::CopyFrom(_) | ProvisionAction::Local(_) => (),
+            }
+        }
+    }
+    (privilege, providers)
+}
+
 pub fn unavailable(
     project: &LoadedProject,
     ambient_environment: Option<&OsStr>,
@@ -526,6 +675,28 @@ pub fn trust(
     ambient_environment: Option<&OsStr>,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    request: &TrustRequest,
+    stderr: &mut dyn Write,
+) -> Result<TrustOutput, TrustCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    trust_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+        stderr,
+    )
+}
+
+pub fn trust_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     request: &TrustRequest,
     stderr: &mut dyn Write,
 ) -> Result<TrustOutput, TrustCommandError> {
@@ -575,11 +746,19 @@ pub fn trust(
         diagnostic: error.to_string(),
     })?;
 
+    let auth_profiles: Vec<_> = plan
+        .entities
+        .iter()
+        .filter_map(|entity| entity.jump.as_ref().map(|jump| jump.auth_profile.as_str()))
+        .collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
+    drop(store_context);
     let mut fetcher =
         broil_remote::transport::RusshHostKeyFetcher::with_auth_context(Some(auth_context))
             .map_err(|error| TrustCommandError::Runtime {
@@ -624,6 +803,26 @@ pub fn check(
     env_snapshot: &[(OsString, OsString)],
     request: &CheckRequest,
 ) -> Result<CheckOutput, CheckCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    check_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn check_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    request: &CheckRequest,
+) -> Result<CheckOutput, CheckCommandError> {
     let inventory = broil_remote::resolve(project, ambient_environment).map_err(|error| {
         CheckCommandError::Runtime {
             class: FailureClass::Configuration,
@@ -652,16 +851,26 @@ pub fn check(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    let auth_profiles = authentication_profiles(&inventory, &selected, false);
+    let privilege_profiles: Vec<_> = selected
+        .iter()
+        .filter(|_| request.sudo)
+        .filter_map(|machine| machine.privilege_profile.as_deref())
+        .collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let privilege_context = broil_remote::check::PrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    drop(store_context);
     let backend =
         broil_remote::check::RusshCheckBackend::new(store, auth_context, privilege_context);
     let outcome = broil_remote::check::run(
@@ -736,6 +945,26 @@ pub fn stats(
     env_snapshot: &[(OsString, OsString)],
     request: &StatsRequest,
 ) -> Result<StatsOutput, StatsCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    stats_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn stats_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    request: &StatsRequest,
+) -> Result<StatsOutput, StatsCommandError> {
     let (inventory, stats_request) =
         stats_request(project, ambient_environment, cwd, env_snapshot, request)?;
     let store = match stats_request.known_hosts.source {
@@ -754,16 +983,28 @@ pub fn stats(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    let selected = broil_remote::select(&inventory, &stats_request.selectors, false)
+        .map_err(StatsCommandError::Usage)?;
+    let auth_profiles = authentication_profiles(&inventory, &selected, false);
+    let privilege_profiles: Vec<_> = selected
+        .iter()
+        .filter_map(|machine| inventory.scripts.get(machine.stats_script.as_ref()?))
+        .filter_map(|script| script.privilege.as_deref())
+        .collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let privilege_context = broil_remote::exec::PrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    drop(store_context);
     let backend =
         broil_remote::stats::RusshStatsBackend::new(store, auth_context, privilege_context);
     let outcome =
@@ -792,6 +1033,26 @@ pub fn exec(
     ambient_environment: Option<&OsStr>,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    request: &ExecRequest,
+) -> Result<ExecOutput, ExecCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    exec_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn exec_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     request: &ExecRequest,
 ) -> Result<ExecOutput, ExecCommandError> {
     let inventory = broil_remote::resolve(project, ambient_environment).map_err(|error| {
@@ -834,16 +1095,22 @@ pub fn exec(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    let auth_profiles = authentication_profiles(&inventory, &selected, false);
+    let privilege_profiles: Vec<_> = request.privilege.as_deref().into_iter().collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let privilege_context = broil_remote::exec::PrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    drop(store_context);
     let backend = broil_remote::exec::RusshExecBackend::new(store, auth_context, privilege_context);
     let outcome = broil_remote::exec::run(
         &project.broil_root,
@@ -889,6 +1156,26 @@ pub fn ssh(
     ambient_environment: Option<&OsStr>,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    request: &SshRequest,
+) -> Result<SshOutput, SshCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    ssh_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn ssh_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     request: &SshRequest,
 ) -> Result<SshOutput, SshCommandError> {
     let inventory = broil_remote::resolve(project, ambient_environment).map_err(|error| {
@@ -937,11 +1224,15 @@ pub fn ssh(
             class: error.class(),
             diagnostic: error.to_string(),
         })?;
+        let auth_profiles = authentication_profiles(&inventory, &selected, true);
+        let store_context =
+            StoreContext::from_project(project, &inventory.environment, cwd, inputs);
         let auth_context = broil_remote::auth::AuthContext::from_project(
             project,
             &inventory.environment,
             env_snapshot,
-        );
+        )
+        .with_store_context_for_profiles(store_context, &auth_profiles);
         let cancel = broil_remote::scheduler::CancellationToken::default();
         let _interrupt = broil_remote::ssh::spawn_bootstrap_interrupt_watcher(cancel.clone());
         let outcome = broil_remote::ssh::run_bootstrap_interactive(
@@ -985,6 +1276,7 @@ pub fn ssh(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    drop(inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
@@ -1021,6 +1313,26 @@ pub fn run(
     ambient_environment: Option<&OsStr>,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    request: &RunRequest,
+) -> Result<RunOutput, RunCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    run_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn run_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     request: &RunRequest,
 ) -> Result<RunOutput, RunCommandError> {
     let inventory = broil_remote::resolve(project, ambient_environment).map_err(|error| {
@@ -1063,16 +1375,27 @@ pub fn run(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    let auth_profiles = authentication_profiles(&inventory, &selected, false);
+    let privilege_profiles: Vec<_> = std::str::from_utf8(&request.script)
+        .ok()
+        .and_then(|name| inventory.scripts.get(name))
+        .and_then(|script| script.privilege.as_deref())
+        .into_iter()
+        .collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let privilege_context = broil_remote::exec::PrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    drop(store_context);
     let backend = broil_remote::exec::RusshExecBackend::new(store, auth_context, privilege_context);
     let outcome = broil_remote::exec::run_script(
         &project.broil_root,
@@ -1117,12 +1440,33 @@ pub fn copy_to(
     env_snapshot: &[(OsString, OsString)],
     request: &CopyToRequest,
 ) -> Result<TransferOutput, TransferCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    copy_to_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn copy_to_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    request: &CopyToRequest,
+) -> Result<TransferOutput, TransferCommandError> {
     let (inventory, transfer_request) =
         copy_to_transfer_request(project, ambient_environment, cwd, env_snapshot, request)?;
     run_transfer(
         project,
         cwd,
         env_snapshot,
+        inputs,
         &inventory,
         &transfer_request,
         request.report.as_deref(),
@@ -1136,12 +1480,33 @@ pub fn copy_from(
     env_snapshot: &[(OsString, OsString)],
     request: &CopyFromRequest,
 ) -> Result<TransferOutput, TransferCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    copy_from_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn copy_from_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    request: &CopyFromRequest,
+) -> Result<TransferOutput, TransferCommandError> {
     let (inventory, transfer_request) =
         copy_from_transfer_request(project, ambient_environment, cwd, env_snapshot, request)?;
     run_transfer(
         project,
         cwd,
         env_snapshot,
+        inputs,
         &inventory,
         &transfer_request,
         request.report.as_deref(),
@@ -1202,12 +1567,33 @@ pub fn execute_provision(
     env_snapshot: &[(OsString, OsString)],
     request: &ProvisionRequest,
 ) -> Result<ProvisionOutput, ProvisionCommandError> {
+    let inputs = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = ordinary_snapshot(env_snapshot);
+    execute_provision_protected(
+        project,
+        ambient_environment,
+        cwd,
+        &ordinary,
+        inputs,
+        request,
+    )
+}
+
+pub fn execute_provision_protected(
+    project: &LoadedProject,
+    ambient_environment: Option<&OsStr>,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+    request: &ProvisionRequest,
+) -> Result<ProvisionOutput, ProvisionCommandError> {
     let (inventory, provision_request) =
         provision_request(project, ambient_environment, cwd, env_snapshot, request)?;
     run_provision(
         project,
         cwd,
         env_snapshot,
+        inputs,
         &inventory,
         &provision_request,
         request.report.as_deref(),
@@ -1328,20 +1714,29 @@ fn run_transfer(
     project: &LoadedProject,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     inventory: &broil_remote::EffectiveInventory,
     request: &broil_remote::transfer::TransferRequest,
     report: Option<&Path>,
 ) -> Result<TransferOutput, TransferCommandError> {
+    let selected = broil_remote::select(inventory, &request.selectors, false)
+        .map_err(TransferCommandError::Usage)?;
+    let auth_profiles = authentication_profiles(inventory, &selected, false);
+    let privilege_profiles: Vec<_> = request.privilege.as_deref().into_iter().collect();
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let privilege_context = broil_remote::transfer::TransferPrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    drop(store_context);
     let backend = broil_remote::transfer::SftpSetupBackend::with_privilege_context(
         auth_context,
         privilege_context,
@@ -1367,6 +1762,7 @@ fn run_provision(
     project: &LoadedProject,
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
     inventory: &broil_remote::EffectiveInventory,
     request: &broil_remote::provision::ProvisionRequest,
     report: Option<&Path>,
@@ -1385,21 +1781,39 @@ fn run_provision(
         class: error.class(),
         diagnostic: error.to_string(),
     })?;
+    let mut selected = broil_remote::select(inventory, &request.selectors, false)
+        .map_err(ProvisionCommandError::Usage)?;
+    if request.fail_fast
+        && selected
+            .iter()
+            .any(|machine| machine.provision_profiles.is_empty())
+    {
+        selected.clear();
+    } else {
+        selected.retain(|machine| matches!(&machine.plan, Ok(Some(_))));
+    }
+    let auth_profiles = authentication_profiles(inventory, &selected, true);
+    let (privilege_profiles, stdin_providers) = provision_consumers(&selected);
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
     let auth_context = broil_remote::auth::AuthContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &auth_profiles);
     let exec_privilege_context = broil_remote::exec::PrivilegeContext::from_project(
         project,
         &inventory.environment,
         env_snapshot,
-    );
-    let transfer_privilege_context = broil_remote::transfer::TransferPrivilegeContext::from_project(
-        project,
-        &inventory.environment,
-        env_snapshot,
-    );
+    )
+    .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
+    let transfer_privilege_context =
+        broil_remote::transfer::TransferPrivilegeContext::from_project(
+            project,
+            &inventory.environment,
+            env_snapshot,
+        )
+        .with_store_context_for_profiles(store_context.clone(), &privilege_profiles);
     let env_remote = &project.config.environments[&inventory.environment]
         .remote
         .definitions;
@@ -1409,7 +1823,9 @@ fn run_provision(
         project.broil_root.clone(),
         env_snapshot.to_vec(),
         secret_providers,
-    );
+    )
+    .with_store_context_for_providers(store_context.clone(), &stdin_providers);
+    drop(store_context);
     let local_artifact_home = resolve_provision_home(env_snapshot)?;
     let exec_backend = broil_remote::exec::RusshExecBackend::new(
         store.clone(),
@@ -1751,7 +2167,7 @@ fn confirm_cancellable_from_terminal(
 fn read_cancellable_trust_confirmation(
     cancel: &broil_remote::scheduler::CancellationToken,
 ) -> broil_remote::trust::TrustConfirmation {
-    match broil_remote::secret::read_stdin_line_cancellable(cancel, false) {
+    match broil_core::secret::read_stdin_line_cancellable(&|| cancel.is_cancelled(), false) {
         Ok(answer) => {
             if std::str::from_utf8(&answer).is_ok_and(|answer| answer.trim_end() == "yes") {
                 broil_remote::trust::TrustConfirmation::Accepted
@@ -2803,5 +3219,50 @@ fn action_json(action: &EffectivePlanAction) -> Value {
             "when": action.when.as_ref().map(timed_action_json),
         }),
     }
+}
+
+pub(crate) fn argv_backend(
+    project: &LoadedProject,
+    inventory: &broil_remote::EffectiveInventory,
+    machine: &EffectiveMachine,
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    inputs: CredentialInputs,
+) -> Option<broil_remote::exec::RusshExecBackend> {
+    let location = resolve_known_hosts_location(
+        &project.broil_root,
+        inventory.known_hosts.as_deref(),
+        cwd,
+        env_snapshot,
+        None,
+    )
+    .ok()?;
+    let store = match location {
+        KnownHostsLocation::Default(home) => {
+            broil_remote::known_hosts::KnownHostsStore::open_default(&home)
+        }
+        KnownHostsLocation::Override(path) => {
+            broil_remote::known_hosts::KnownHostsStore::open_override(&path)
+        }
+    }
+    .ok()?;
+    let auth_profiles = authentication_profiles(inventory, &[machine], false);
+    let store_context = StoreContext::from_project(project, &inventory.environment, cwd, inputs);
+    let auth_context = broil_remote::auth::AuthContext::from_project(
+        project,
+        &inventory.environment,
+        env_snapshot,
+    )
+    .with_store_context_for_profiles(store_context, &auth_profiles);
+    let privilege_context = broil_remote::exec::PrivilegeContext::from_project(
+        project,
+        &inventory.environment,
+        env_snapshot,
+    );
+    Some(broil_remote::exec::RusshExecBackend::new(
+        store,
+        auth_context,
+        privilege_context,
+    ))
 }
 

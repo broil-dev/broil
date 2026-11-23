@@ -25,16 +25,37 @@ pub fn execute_one_shot(
     command_tokens: &[OsString],
     base_env: &[(OsString, OsString)],
 ) -> Result<i32, ExecutionError> {
+    execute_one_shot_with_inputs(
+        broil_root,
+        config,
+        name,
+        cwd,
+        command_tokens,
+        base_env,
+        crate::injection::Inputs::borrowed(cwd, base_env),
+    )
+}
+
+pub fn execute_one_shot_with_inputs(
+    broil_root: &Path,
+    config: &BroilConfig,
+    name: &OsStr,
+    cwd: &Path,
+    command_tokens: &[OsString],
+    base_env: &[(OsString, OsString)],
+    inputs: crate::injection::Inputs<'_>,
+) -> Result<i32, ExecutionError> {
     let resolved = execenv::resolve(config, Some(name))?;
     let env = execenv::child_env(base_env, &resolved, broil_root);
-    let mut child = Command::new("bash")
+    let injection = crate::injection::Injection::resolve(config, broil_root, Some(name), inputs)?;
+    let mut command = Command::new("bash");
+    command
         .arg("-c")
         .arg(one_shot_command(command_tokens.len()))
         .args(command_tokens)
-        .current_dir(cwd)
-        .env_clear()
-        .envs(&env)
-        .spawn()
+        .current_dir(cwd);
+    let mut child = injection
+        .spawn(command, &env)
         .map_err(|error| spawn_error("run", error))?;
     let status = child
         .wait()
@@ -50,18 +71,59 @@ pub fn execute_interactive(
     tmp_parent: &Path,
     base_env: &[(OsString, OsString)],
 ) -> Result<i32, ExecutionError> {
+    execute_interactive_with_inputs(
+        broil_root,
+        config,
+        name,
+        cwd,
+        tmp_parent,
+        base_env,
+        crate::injection::Inputs::borrowed(cwd, base_env),
+    )
+}
+
+pub fn execute_interactive_with_inputs(
+    broil_root: &Path,
+    config: &BroilConfig,
+    name: &OsStr,
+    cwd: &Path,
+    tmp_parent: &Path,
+    base_env: &[(OsString, OsString)],
+    inputs: crate::injection::Inputs<'_>,
+) -> Result<i32, ExecutionError> {
     let resolved = execenv::resolve(config, Some(name))?;
     let env = execenv::child_env(base_env, &resolved, broil_root);
+    let injection = crate::injection::Injection::resolve(config, broil_root, Some(name), inputs)?;
     let env_name = resolved.env_name.as_deref().unwrap_or_default();
-    let contents = rcfile_contents(&resolved.env_vars, broil_root, env_name);
-    let rcfile = create_rcfile(tmp_parent, &contents)?;
-    let mut child = Command::new("bash")
-        .arg("--rcfile")
-        .arg(rcfile.path())
-        .current_dir(cwd)
-        .env_clear()
-        .envs(&env)
-        .spawn()
+    let (before, after) = rcfile_parts(&resolved.env_vars, broil_root, env_name);
+    let contents = injection.rcfile(&before, &after)?;
+    let rcfile = if injection.enabled {
+        let runtime = base_env
+            .iter()
+            .find(|(k, _)| k == "XDG_RUNTIME_DIR")
+            .map(|(_, v)| Path::new(v))
+            .filter(|p| !p.as_os_str().is_empty());
+        let mut parents = Vec::new();
+        if let Some(runtime) = runtime {
+            parents.push(runtime);
+        }
+        parents.push(Path::new("/dev/shm"));
+        ShellRcfile::Protected(
+            broil_secrets::store::PrivateTemp::create(
+                contents.as_bytes(),
+                &parents,
+                Some(tmp_parent),
+            )
+            .map_err(crate::injection::error)?,
+        )
+    } else {
+        ShellRcfile::Ordinary(create_rcfile(tmp_parent, contents.as_bytes())?)
+    };
+    drop(contents);
+    let mut command = Command::new("bash");
+    command.arg("--rcfile").arg(rcfile.path()?).current_dir(cwd);
+    let mut child = injection
+        .spawn(command, &env)
         .map_err(|error| spawn_error("run", error))?;
     let status = child
         .wait()
@@ -69,6 +131,19 @@ pub fn execute_interactive(
     let code = execenv::status_code(status);
     drop(rcfile);
     code
+}
+
+enum ShellRcfile {
+    Ordinary(Rcfile),
+    Protected(broil_secrets::store::PrivateTemp),
+}
+impl ShellRcfile {
+    fn path(&self) -> Result<&Path, ExecutionError> {
+        match self {
+            Self::Ordinary(file) => Ok(file.path()),
+            Self::Protected(file) => file.path().map_err(crate::injection::error),
+        }
+    }
 }
 
 pub fn one_shot_command(token_count: usize) -> String {
@@ -133,11 +208,23 @@ pub fn rcfile_contents(
     broil_root: &Path,
     env_name: &str,
 ) -> Vec<u8> {
+    let (mut before, after) = rcfile_parts(configured, broil_root, env_name);
+    before.extend_from_slice(&after);
+    before
+}
+
+fn rcfile_parts(
+    configured: &BTreeMap<String, String>,
+    broil_root: &Path,
+    env_name: &str,
+) -> (Vec<u8>, Vec<u8>) {
     let mut out = Vec::new();
     out.extend_from_slice(GUARDS.as_bytes());
     for (name, value) in configured {
         push_export(&mut out, name.as_bytes(), value.as_bytes());
     }
+    let before = out;
+    let mut out = Vec::new();
     push_export(&mut out, b"BROIL_ROOT", broil_root.as_os_str().as_bytes());
     push_export(&mut out, b"BROIL_ENV", env_name.as_bytes());
 
@@ -188,7 +275,7 @@ pub fn rcfile_contents(
         .as_bytes(),
     );
     out.extend_from_slice(b"fi\n");
-    out
+    (before, out)
 }
 
 fn push_export(out: &mut Vec<u8>, name: &[u8], value: &[u8]) {

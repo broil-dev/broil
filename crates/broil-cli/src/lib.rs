@@ -11,6 +11,12 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 pub mod alias;
+mod image;
+mod k3s;
+pub mod secrets;
+
+use broil_core::secret::environment::CredentialInputs;
+use std::cell::RefCell;
 
 use broil_command::{execenv, executable, get, help, remote, version};
 use broil_config::{LoadMode, LoadedProject};
@@ -24,10 +30,18 @@ pub fn run() -> ExitCode {
         return ExitCode::from(code as u8);
     }
 
-    let env_snapshot: Vec<(OsString, OsString)> = env::vars_os().collect();
+    let (env_snapshot, credentials) = CredentialInputs::capture(env::vars_os());
     let cwd = match env::current_dir() {
         Ok(cwd) => cwd,
         Err(error) => {
+            if let Some(verb) = selected_secrets(&args) {
+                return ExitCode::from(broil_command::secrets::failure(
+                    verb,
+                    &mut stderr,
+                    "current directory",
+                    1,
+                ) as u8);
+            }
             let _ = writeln!(
                 stderr,
                 "broil: cannot determine the current directory: {error}"
@@ -35,7 +49,14 @@ pub fn run() -> ExitCode {
             return ExitCode::from(1);
         }
     };
-    let code = run_with(&args, &cwd, &env_snapshot, &mut stdout, &mut stderr);
+    let code = run_protected(
+        &args,
+        &cwd,
+        &env_snapshot,
+        credentials,
+        &mut stdout,
+        &mut stderr,
+    );
     ExitCode::from(code as u8)
 }
 
@@ -43,6 +64,22 @@ pub fn run_with(
     args: &[OsString],
     cwd: &Path,
     env_snapshot: &[(OsString, OsString)],
+    stdout: &mut dyn Write,
+    stderr: &mut dyn Write,
+) -> i32 {
+    if let Some(code) = try_dispatch_config_independent(args, stdout, stderr) {
+        return code;
+    }
+    let credentials = CredentialInputs::borrowed(env_snapshot);
+    let ordinary = broil_core::secret::environment::ordinary_snapshot(env_snapshot);
+    run_protected(args, cwd, &ordinary, credentials, stdout, stderr)
+}
+
+fn run_protected(
+    args: &[OsString],
+    cwd: &Path,
+    env_snapshot: &[(OsString, OsString)],
+    credentials: CredentialInputs,
     stdout: &mut dyn Write,
     stderr: &mut dyn Write,
 ) -> i32 {
@@ -82,7 +119,17 @@ pub fn run_with(
     };
     let project = match broil_config::load(&mode) {
         Ok(project) => project,
-        Err(error) => return report(stderr, &error, error.class().exit_code()),
+        Err(error) => {
+            if let BuiltinMatch::Complete(BuiltinLeaf::Secrets(leaf)) = &builtin {
+                return broil_command::secrets::failure(
+                    leaf.verb,
+                    stderr,
+                    "configuration",
+                    error.class().exit_code(),
+                );
+            }
+            return report(stderr, &error, error.class().exit_code());
+        }
     };
 
     let context = Context {
@@ -90,6 +137,7 @@ pub fn run_with(
         explicit_file: explicit_file_used,
         cwd,
         env_snapshot,
+        credentials: RefCell::new(credentials),
     };
 
     let builtin_partial = match builtin {
@@ -159,6 +207,7 @@ struct Context<'a> {
     explicit_file: bool,
     cwd: &'a Path,
     env_snapshot: &'a [(OsString, OsString)],
+    credentials: RefCell<CredentialInputs>,
 }
 
 enum BuiltinMatch<'a> {
@@ -172,6 +221,9 @@ enum BuiltinLeaf<'a> {
     Env(&'a [OsString]),
     Get(GetLeaf<'a>),
     Remote(RemoteLeaf<'a>),
+    Secrets(secrets::Leaf<'a>),
+    Image(image::Leaf<'a>),
+    K3s(k3s::Leaf<'a>),
     Help(HelpLeaf<'a>),
     Version(&'a [OsString]),
 }
@@ -283,6 +335,15 @@ fn resolve_builtin(tokens: &[OsString]) -> BuiltinMatch<'_> {
                 operands: rest,
             }));
         };
+        if topic == "secrets" {
+            return secrets::resolve(operands, true);
+        }
+        if topic == "image" {
+            return image::resolve(operands, true);
+        }
+        if topic == "k3s" {
+            return k3s::resolve(operands, true);
+        }
         if topic == "remote" {
             let Some((verb, trailing)) = operands.split_first() else {
                 return BuiltinMatch::Complete(BuiltinLeaf::Help(HelpLeaf {
@@ -348,6 +409,15 @@ fn resolve_builtin(tokens: &[OsString]) -> BuiltinMatch<'_> {
             }));
         }
         return resolve_get(rest);
+    }
+    if command == "secrets" {
+        return secrets::resolve(rest, false);
+    }
+    if command == "image" {
+        return image::resolve(rest, false);
+    }
+    if command == "k3s" {
+        return k3s::resolve(rest, false);
     }
     if command == "remote" {
         if rest.first().is_some_and(|token| token == "--help") {
@@ -456,21 +526,23 @@ fn dispatch_builtin(
     stdout: &mut dyn Write,
     stderr: &mut dyn Write,
 ) -> i32 {
+    if !matches!(
+        &leaf,
+        BuiltinLeaf::Secrets(_)
+            | BuiltinLeaf::Image(_)
+            | BuiltinLeaf::K3s(_)
+            | BuiltinLeaf::Run(_)
+            | BuiltinLeaf::Env(_)
+            | BuiltinLeaf::Remote(_)
+    ) {
+        drop(context.credentials.take());
+    }
     match leaf {
-        BuiltinLeaf::Run(rest) => run_run(
-            rest,
-            context.project,
-            context.explicit_file,
-            context.env_snapshot,
-            stderr,
-        ),
-        BuiltinLeaf::Env(rest) => run_env(
-            rest,
-            context.project,
-            context.cwd,
-            context.env_snapshot,
-            stderr,
-        ),
+        BuiltinLeaf::Secrets(leaf) => secrets::dispatch(leaf, context, stdout, stderr),
+        BuiltinLeaf::Image(leaf) => image::dispatch(leaf, context, stdout, stderr),
+        BuiltinLeaf::K3s(leaf) => k3s::dispatch(leaf, context, stdout, stderr),
+        BuiltinLeaf::Run(rest) => run_run(rest, context, stderr),
+        BuiltinLeaf::Env(rest) => run_env(rest, context, stderr),
         BuiltinLeaf::Get(leaf) => run_get(leaf, context.project, stdout, stderr),
         BuiltinLeaf::Remote(leaf) => run_remote(leaf, context, stdout, stderr),
         leaf @ (BuiltinLeaf::Help(_) | BuiltinLeaf::Version(_)) => {
@@ -519,9 +591,12 @@ fn dispatch_config_independent(
             write_builtin_payload(stdout, stderr, &version::render())
         }
         BuiltinLeaf::Run(_)
+        | BuiltinLeaf::Image(_)
+        | BuiltinLeaf::K3s(_)
         | BuiltinLeaf::Env(_)
         | BuiltinLeaf::Get(_)
-        | BuiltinLeaf::Remote(_) => {
+        | BuiltinLeaf::Remote(_)
+        | BuiltinLeaf::Secrets(_) => {
             unreachable!("config-dependent leaf sent to config-independent dispatch")
         }
     }
@@ -615,70 +690,78 @@ fn run_executable(
         context.explicit_file,
         ambient_broil_env(context.env_snapshot),
     );
-    match executable::execute(
+    match executable::execute_with_inputs(
         path,
         &context.project.broil_root,
         &context.project.config,
         active,
         args,
         context.env_snapshot,
+        broil_command::injection::Inputs {
+            cwd: context.cwd,
+            credentials: context.credentials.take(),
+        },
     ) {
         Ok(code) => code,
         Err(error) => report(stderr, &error, error.class().exit_code()),
     }
 }
 
-fn run_run(
-    rest: &[OsString],
-    project: &LoadedProject,
-    explicit_file: bool,
-    env_snapshot: &[(OsString, OsString)],
-    stderr: &mut dyn Write,
-) -> i32 {
+fn run_run(rest: &[OsString], context: &Context<'_>, stderr: &mut dyn Write) -> i32 {
     let Some((script, child_args)) = rest.split_first() else {
         return usage(stderr, &UsageError::MissingRunScript);
     };
-    let active = execenv::select_execution_env(explicit_file, ambient_broil_env(env_snapshot));
-    match broil_command::run::execute(
-        &project.broil_root,
-        &project.config,
+    let active = execenv::select_execution_env(
+        context.explicit_file,
+        ambient_broil_env(context.env_snapshot),
+    );
+    match broil_command::run::execute_with_inputs(
+        &context.project.broil_root,
+        &context.project.config,
         active,
         script,
         child_args,
-        env_snapshot,
+        context.env_snapshot,
+        broil_command::injection::Inputs {
+            cwd: context.cwd,
+            credentials: context.credentials.take(),
+        },
     ) {
         Ok(code) => code,
         Err(error) => report(stderr, &error, error.class().exit_code()),
     }
 }
 
-fn run_env(
-    rest: &[OsString],
-    project: &LoadedProject,
-    cwd: &Path,
-    env_snapshot: &[(OsString, OsString)],
-    stderr: &mut dyn Write,
-) -> i32 {
+fn run_env(rest: &[OsString], context: &Context<'_>, stderr: &mut dyn Write) -> i32 {
     let Some((name, command_tokens)) = rest.split_first() else {
         return usage(stderr, &UsageError::MissingEnvName);
     };
+    let project = context.project;
+    let cwd = context.cwd;
+    let env_snapshot = context.env_snapshot;
+    let inputs = broil_command::injection::Inputs {
+        cwd,
+        credentials: context.credentials.take(),
+    };
     let result = if command_tokens.is_empty() {
-        broil_command::env::execute_interactive(
+        broil_command::env::execute_interactive_with_inputs(
             &project.broil_root,
             &project.config,
             name,
             cwd,
             &tmp_parent(env_snapshot),
             env_snapshot,
+            inputs,
         )
     } else {
-        broil_command::env::execute_one_shot(
+        broil_command::env::execute_one_shot_with_inputs(
             &project.broil_root,
             &project.config,
             name,
             cwd,
             command_tokens,
             env_snapshot,
+            inputs,
         )
     };
     match result {
@@ -704,6 +787,7 @@ fn run_remote(
     stderr: &mut dyn Write,
 ) -> i32 {
     if matches!(leaf.verb, RemoteVerb::List) {
+        drop(context.credentials.take());
         let request = match parse_remote_list(leaf.operands) {
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
@@ -741,11 +825,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::trust(
+        return match remote::trust_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
             stderr,
         ) {
@@ -763,11 +848,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::check(
+        return match remote::check_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => match write_payload(stdout, &output.payload) {
@@ -784,11 +870,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::stats(
+        return match remote::stats_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => match write_payload(stdout, &output.payload) {
@@ -805,11 +892,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::exec(
+        return match remote::exec_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => {
@@ -831,11 +919,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::ssh(
+        return match remote::ssh_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => output.status,
@@ -849,11 +938,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::run(
+        return match remote::run_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => {
@@ -875,11 +965,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::copy_to(
+        return match remote::copy_to_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => match write_payload(stdout, &output.payload) {
@@ -896,11 +987,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::copy_from(
+        return match remote::copy_from_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => match write_payload(stdout, &output.payload) {
@@ -917,11 +1009,12 @@ fn run_remote(
             Ok(request) => request,
             Err(error) => return usage(stderr, &error),
         };
-        return match remote::execute_provision(
+        return match remote::execute_provision_protected(
             context.project,
             ambient_broil_env(context.env_snapshot),
             context.cwd,
             context.env_snapshot,
+            context.credentials.take(),
             &request,
         ) {
             Ok(output) => match write_payload(stdout, &output.payload) {
@@ -2365,5 +2458,16 @@ fn report(stderr: &mut dyn Write, message: &dyn fmt::Display, code: i32) -> i32 
 
 fn usage(stderr: &mut dyn Write, error: &UsageError) -> i32 {
     report(stderr, error, error.class().exit_code())
+}
+
+fn selected_secrets(args: &[OsString]) -> Option<broil_command::secrets::Verb> {
+    let mut index = 0;
+    while args.get(index).is_some_and(|s| s == "--file") {
+        index += if args.get(index + 1).is_some() { 2 } else { 1 };
+    }
+    match resolve_builtin(&args[index..]) {
+        BuiltinMatch::Complete(BuiltinLeaf::Secrets(leaf)) => Some(leaf.verb),
+        _ => None,
+    }
 }
 
